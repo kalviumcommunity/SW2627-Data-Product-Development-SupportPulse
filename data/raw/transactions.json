@@ -1,0 +1,26 @@
+[
+  {
+    "transaction_id": 1001,
+    "customer_id": 101,
+    "amount": 250.75,
+    "status": "Completed"
+  },
+  {
+    "transaction_id": 1002,
+    "customer_id": 102,
+    "amount": 120.50,
+    "status": "Pending"
+  },
+  {
+    "transaction_id": 1003,
+    "customer_id": 103,
+    "amount": 560.00,
+    "status": "Completed"
+  },
+  {
+    "transaction_id": 1004,
+    "customer_id": 104,
+    "amount": 89.99,
+    "status": "Failed"
+  }
+]
