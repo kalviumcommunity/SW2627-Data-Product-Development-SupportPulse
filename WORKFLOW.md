@@ -2,13 +2,13 @@
 
 ## Branch Strategy
 
-- main contains stable code.
+- README contains the stable project code.
 - Every new feature is developed in a feature branch.
 - Feature branches follow:
   feature/<feature-name>
 
 Example:
-feature/customer-validation
+feature/customer-validation 
 
 Branches are deleted after merge.
 
