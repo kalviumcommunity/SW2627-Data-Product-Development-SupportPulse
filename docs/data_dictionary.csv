@@ -1,0 +1,4 @@
+column_name,data_type,description,business_meaning,example_value,related_kpi,notes
+customer_id,Integer,Unique customer ID,Identifies each customer,1001,Customer Count,Primary Key
+ticket_category,String,Complaint category,Reason for customer issue,Billing,Complaint Distribution,Categorical
+resolution_time,Float,Hours to resolve ticket,Support efficiency,5.2,Average Resolution Time,Hours
