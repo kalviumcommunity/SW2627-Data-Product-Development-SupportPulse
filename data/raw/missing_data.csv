@@ -1,0 +1,7 @@
+customer_id,name,email,amount,category,last_updated
+1,Alice,alice@example.com,100,A,2025-01-01
+2,Bob,,250,B,2025-01-02
+3,Alice,alice@example.com,100,A,
+4,,charlie@example.com,500,C,2025-01-04
+5,Diana,,200,B,
+6,Emma,emma@example.com,,A,2025-01-06
