@@ -1,0 +1,9 @@
+Rule,Passed,Failed
+Age,8,2
+Price,8,2
+Birth Date,8,2
+Customer ID,9,1
+Email Present,9,1
+Email Format,7,3
+Phone,8,2
+Date Order,7,3

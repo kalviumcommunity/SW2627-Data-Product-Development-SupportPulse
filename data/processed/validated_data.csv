@@ -1,0 +1,4 @@
+customer_id,age,price,birth_date,email,phone,start_date,end_date,valid_age,valid_price,valid_birth_date,valid_customer_id,valid_email,valid_email_format,valid_phone,valid_date_order,passes_all_checks
+101.0,25,1500,1999-05-12,john@gmail.com,9876543210,2025-01-01,2025-01-31,True,True,True,True,True,True,True,True,True
+108.0,60,1500,1984-01-30,rose@gmail.com,9876543217,2025-08-01,2025-08-28,True,True,True,True,True,True,True,True,True
+110.0,45,4000,1995-11-25,tom@gmail.com,9876543219,2025-10-01,2025-10-30,True,True,True,True,True,True,True,True,True
