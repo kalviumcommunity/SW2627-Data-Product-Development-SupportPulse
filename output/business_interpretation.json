@@ -1,0 +1,12 @@
+{
+    "support_tickets <-> churn": {
+        "correlation": 0.8,
+        "possible_directions": [
+            "Support tickets \u2192 Churn (customers leave after repeated issues)",
+            "Churn \u2192 Support tickets (customers contact support before leaving)",
+            "Customer pain \u2192 Both support tickets and churn"
+        ],
+        "data_indicates": "Customer pain is the likely confounding factor. Support tickets are a symptom rather than the root cause.",
+        "business_action": "Reduce customer issues instead of discouraging support requests."
+    }
+}
