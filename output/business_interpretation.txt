@@ -1,0 +1,23 @@
+
+Revenue Distribution Analysis
+
+Skewness : 2.01
+=> Highly Right Skewed
+
+Mean Revenue : 89033.33
+
+Median Revenue : 22000.00
+
+Interpretation:
+Most customers generate low revenue while a small number of enterprise customers contribute very high revenue.
+
+Kurtosis : 3.04
+
+=> Heavy Tails (Outliers Present)
+
+Maximum Revenue : 500000.00
+
+99th Percentile : 472000.00
+
+Business Action:
+Segment customers into Small, Medium and Enterprise groups for targeted marketing and pricing strategies.
