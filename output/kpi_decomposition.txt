@@ -1,0 +1,14 @@
+Total Revenue
+$18,317.00
+
+Revenue by Segment
+customer_type
+Enterprise    5969
+SMB           6923
+Startup       5425
+
+Revenue by Product
+product
+Basic      6048
+Premium    7656
+Pro        4613
