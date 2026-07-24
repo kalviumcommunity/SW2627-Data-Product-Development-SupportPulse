@@ -1,0 +1,44 @@
+
+FUNNEL OPTIMIZATION PRIORITY
+============================
+
+CRITICAL BOTTLENECK
+-------------------
+Stage:
+Sign Up
+→
+Email Entered
+
+Users Lost:
+2,000
+
+Drop Rate:
+20.0%
+
+Revenue Impact:
+$200,000
+
+ROOT CAUSE HYPOTHESES
+---------------------
+• Step may be confusing.
+• Too many form fields.
+• Payment process is lengthy.
+• Users lose trust before purchasing.
+
+RECOMMENDED ACTIONS
+-------------------
+1. Simplify this funnel step.
+2. Run A/B testing.
+3. Track conversion improvement.
+4. Deploy changes if
+   completion improves by >5%.
+
+EXPECTED BUSINESS IMPACT
+------------------------
+10% Improvement
+
+Recovered Users:
+200
+
+Recovered Revenue:
+$20,000
