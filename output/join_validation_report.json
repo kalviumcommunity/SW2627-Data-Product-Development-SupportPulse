@@ -1,0 +1,12 @@
+{
+    "join_type": "left",
+    "left_table": "customers",
+    "right_table": "orders",
+    "join_key": "customer_id",
+    "left_rows": 10,
+    "right_rows": 12,
+    "result_rows": 13,
+    "unmatched_left": 3,
+    "unmatched_right": 2,
+    "reasoning": "Left join preserves all customers while adding order information where available."
+}

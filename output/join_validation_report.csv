@@ -1,0 +1,2 @@
+join_type,left_table,right_table,join_key,left_rows,right_rows,result_rows,unmatched_left,unmatched_right,reasoning
+left,customers,orders,customer_id,10,12,13,3,2,Left join preserves all customers while adding order information where available.
