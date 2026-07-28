@@ -1,0 +1,12 @@
+Validation Rule,Count
+Total Records,10
+Passed Records,3
+Failed Records,7
+Invalid Age,2
+Invalid Price,2
+Invalid Birth Date,2
+Missing Customer ID,1
+Missing Email,1
+Invalid Email,3
+Invalid Phone,2
+Invalid Date Order,3

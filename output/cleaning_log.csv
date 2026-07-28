@@ -1,0 +1,2 @@
+column,method,action,threshold_lower,threshold_upper,affected_rows,date,reason
+revenue,IQR,Cap,260.0,620.0,2,2026-07-22 15:00:03.715030,Extreme revenue values capped to reduce skew.
