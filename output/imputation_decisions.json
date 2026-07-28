@@ -1,0 +1,20 @@
+{
+    "numerical_columns": {
+        "strategy": "Median",
+        "reason": "Median is resistant to outliers."
+    },
+    "categorical_columns": {
+        "strategy": "Mode",
+        "reason": "Mode preserves the most common category."
+    },
+    "datetime_columns": {
+        "strategy": "Forward Fill",
+        "reason": "Assumes previous value remains valid."
+    },
+    "critical_columns": {
+        "strategy": "Drop Rows",
+        "reason": "Primary identifiers should never be imputed."
+    },
+    "before_nulls": 6,
+    "after_nulls": 0
+}
