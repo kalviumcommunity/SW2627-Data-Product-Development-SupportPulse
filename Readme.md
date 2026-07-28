@@ -1,0 +1,1 @@
+Repository follows GitHub Flow.

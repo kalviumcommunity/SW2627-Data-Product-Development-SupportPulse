@@ -1,0 +1,6 @@
+customer_id,ticket_category,resolution_time,escalated,churn
+1,Billing,5.0,Yes,1
+2,Technical,2.0,No,0
+3,Login,8.0,Yes,1
+4,Billing,3.0,No,0
+5,Technical,4.0,Yes,1
