@@ -135,46 +135,6 @@ def run_threshold_monitor(df):
             )
 
     return alerts
-def main():
-
-    os.makedirs(
-        "output",
-        exist_ok=True
-    )
-
-    df = create_sample_dataset()
-
-    print("\nDataset Created")
-    print(df.head())
-
-    run_threshold_monitor(df)
-
-    daily_revenue, anomalies, z_scores = (
-        statistical_monitor(df)
-    )
-
-    severity_df = severity_report(
-        anomalies,
-        z_scores,
-        daily_revenue
-    )
-
-    anomalies_df = log_anomalies(
-        anomalies,
-        z_scores,
-        daily_revenue
-    )
-
-    plot_anomalies(
-        daily_revenue,
-        anomalies
-    )
-
-    print("\nAssignment Completed Successfully.")
-
-
-if __name__ == "__main__":
-    main()
 
 def detect_anomalies_zscore(series, threshold=2):
     """
@@ -448,3 +408,43 @@ def plot_anomalies(
     plt.show()
 
     print("\nVisualization Saved.")
+def main():
+
+    os.makedirs(
+        "output",
+        exist_ok=True
+    )
+
+    df = create_sample_dataset()
+
+    print("\nDataset Created")
+    print(df.head())
+
+    run_threshold_monitor(df)
+
+    daily_revenue, anomalies, z_scores = (
+        statistical_monitor(df)
+    )
+
+    severity_df = severity_report(
+        anomalies,
+        z_scores,
+        daily_revenue
+    )
+
+    anomalies_df = log_anomalies(
+        anomalies,
+        z_scores,
+        daily_revenue
+    )
+
+    plot_anomalies(
+        daily_revenue,
+        anomalies
+    )
+
+    print("\nAssignment Completed Successfully.")
+
+
+if __name__ == "__main__":
+    main()
