@@ -1,0 +1,4 @@
+   Segment Average LTV Churn Rate Average Tickets Average Retention                                                                                                 Recommendation
+Enterprise    $202,000       0.0%             1.4          700 days        Highest customer value with low churn. Maintain premium support and strengthen long-term relationships.
+       SMB     $12,200      60.0%             5.8          228 days    Moderate customer value with higher churn. Improve onboarding, customer engagement, and retention programs.
+   Startup      $3,700      80.0%             7.4          110 days Lowest customer value with frequent support requests. Invest in self-service resources and customer education.
