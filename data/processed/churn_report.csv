@@ -1,0 +1,16 @@
+plan_type,region,churned,total_customers,churn_rate
+Basic,Asia Pacific,2,4,50.0%
+Basic,EMEA,0,4,0.0%
+Basic,Europe,1,9,11.1%
+Basic,Latin America,0,5,0.0%
+Basic,North America,6,12,50.0%
+Premium,Asia Pacific,0,2,0.0%
+Premium,EMEA,1,5,20.0%
+Premium,Europe,2,3,66.7%
+Premium,Latin America,0,6,0.0%
+Premium,North America,1,7,14.3%
+Pro,Asia Pacific,2,8,25.0%
+Pro,EMEA,1,6,16.7%
+Pro,Europe,4,15,26.7%
+Pro,Latin America,1,6,16.7%
+Pro,North America,6,28,21.4%

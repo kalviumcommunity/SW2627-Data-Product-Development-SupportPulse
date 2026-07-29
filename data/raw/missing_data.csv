@@ -1,7 +1,19 @@
-customer_id,name,email,amount,category,last_updated
-1,Alice,alice@example.com,100,A,2025-01-01
-2,Bob,,250,B,2025-01-02
-3,Alice,alice@example.com,100,A,
-4,,charlie@example.com,500,C,2025-01-04
-5,Diana,,200,B,
-6,Emma,emma@example.com,,A,2025-01-06
+customer_id,name,email,phone,signup_date,plan_type,region,tenure_days,monthly_spend,churn_status,churn_date
+72,Charlotte Robinson,charlotte.robinson@example.com,2126920439,2025-09-16,Pro,North America,314,123.44,0,
+60,Mason White,,7034325124,2024-06-23,,Asia Pacific,764,,0,
+40,Ethan Perez,ethan.perez@example.com,9158639417,2025-11-11,,North America,258,40.94,0,
+11,Liam White,liam.white@example.com,,2024-08-19,Pro,,707,105.0,0,
+94,Daniel Gonzalez,daniel.gonzalez@example.com,3102051794,,Pro,Europe,535,125.07,0,
+24,Emma Jones,emma.jones@example.com,6172611652,2025-03-09,Pro,North America,505,,0,
+58,Isabella White,,,2025-12-28,Basic,,211,36.04,0,
+43,Benjamin Lopez,benjamin.lopez@example.com,6177640668,2024-10-27,Pro,North America,638,121.37,0,
+57,Madison Miller,,3105526897,2026-01-14,Basic,EMEA,194,59.39,0,
+75,Henry Perez,henry.perez@example.com,6177373782,,Pro,North America,543,117.93,1,2025-05-16
+29,Aiden Moore,aiden.moore@example.com,2129494684,2026-06-20,Basic,North America,37,,0,
+36,Chloe Wilson,chloe.wilson@example.com,3103761037,2025-08-04,,Asia Pacific,357,119.38,0,
+18,Riley Clark,riley.clark@example.com,3107042034,2024-05-11,Basic,Latin America,807,77.93,0,
+80,Olivia Jones,olivia.jones@example.com,,2025-06-07,Basic,Europe,415,41.24,0,
+64,Grace Clark,grace.clark@example.com,2120465044,2024-05-14,Premium,Latin America,804,278.96,0,
+7,Michael Lee,michael.lee@example.com,7037617088,2025-02-11,Premium,Europe,531,209.47,1,2025-05-04
+111,Mason Clark,mason.clark@example.com,7039852785,,Pro,,581,145.09,0,
+88,Riley Martin,riley.martin@example.com,4154556376,2025-10-15,Basic,EMEA,285,56.59,0,

@@ -1,0 +1,42 @@
+#MainMenu {visibility:hidden;}
+footer {visibility:hidden;}
+header {visibility:hidden;}
+
+.stApp{
+    background:#f7f8fc;
+}
+
+[data-testid="stSidebar"]{
+    background:white;
+    border-right:1px solid #ececec;
+}
+
+.metric-card{
+    background:white;
+    border:1px solid #ededed;
+    border-radius:14px;
+    padding:18px;
+    box-shadow:0px 1px 6px rgba(0,0,0,.05);
+}
+
+.metric-title{
+    color:#7b8190;
+    font-size:13px;
+}
+
+.metric-value{
+    font-size:34px;
+    font-weight:700;
+}
+
+.metric-change-red{
+    color:#ef4444;
+    font-size:12px;
+    float:right;
+}
+
+.metric-change-green{
+    color:#22c55e;
+    font-size:12px;
+    float:right;
+}

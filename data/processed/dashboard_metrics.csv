@@ -1,0 +1,2 @@
+total_customers,active_customers,churn_rate,average_resolution_time,average_csat,escalation_rate,monthly_revenue,revenue_per_customer,ticket_resolution_rate,unresolved_ticket_rate,revenue_lost_to_churn
+120,93,22.5%,13.0,3.85,18.1%,14707.279999999999,122.56,80.0%,20.0%,2995.17

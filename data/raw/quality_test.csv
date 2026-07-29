@@ -1,7 +1,21 @@
-customer_id,name,email,amount,status
-1,Alice,alice@example.com,100,active
-2,Bob,,250,active
-3,Alice,alice@example.com,100,active
-4,,charlie@example.com,500,inactive
-5,Diana,,-50,
-5,Diana,,-50,
+customer_id,name,email,phone,signup_date,plan_type,region,tenure_days,monthly_spend,churn_status,churn_date
+105,Aria Robinson,bademail,4153519490,2024-06-22,Pro,Latin America,765,126.71,0,
+4,Emily Miller,jane@doe,2127057431,2025-06-22,Pro,North America,400,102.93,0,
+29,Aiden Moore,no-at-sign.com,2129494684,2026-06-20,Basic,North America,37,70.58,0,
+73,Michael Jones,user@@example.com,6170903741,2024-07-28,Pro,EMEA,729,103.83,0,
+11,Liam White,liam.white@example.com,12345,2024-08-19,Pro,North America,707,105.0,0,
+48,Aiden Thompson,aiden.thompson@example.com,phone123,2026-03-24,Basic,Latin America,125,35.12,0,
+22,Layla Lopez,layla.lopez@example.com,999,2026-04-02,Premium,EMEA,116,214.94,0,
+99,Lillian Garcia,lillian.garcia@example.com,abcdefghij,2024-07-14,Pro,North America,743,139.33,0,
+67,Luna Ramirez,luna.ramirez@example.com,4150071769,2026-14-01,Pro,North America,114,120.91,0,
+86,Amelia Jackson,amelia.jackson@example.com,2022984539,01/32/2025,Pro,Latin America,290,97.38,0,
+56,Zoe Smith,zoe.smith@example.com,9152381800,2025-02-30,Pro,Europe,529,142.02,0,
+103,Mia Sanchez,mia.sanchez@example.com,2122793036,2025/13/05,Premium,Asia Pacific,756,213.34,0,
+115,Samuel White,samuel.white@example.com,8048238951,2025-12-09,Pro,Asia Pacific,230,-20.0,1,2026-01-26
+91,Charlotte Miller,charlotte.miller@example.com,4157528179,2026-05-06,Basic,Europe,82,-5.5,1,2026-07-05
+21,Penelope Robinson,penelope.robinson@example.com,2129190708,2025-06-13,Pro,North America,409,0.0,1,2026-02-17
+36,Chloe Wilson,chloe.wilson@example.com,3103761037,2025-08-04,Pro,Asia Pacific,357,-100.0,0,
+40,Ethan Perez,ethan.perez@example.com,9158639417,2025-11-11,Basic,North America,-5,40.94,0,
+37,Evelyn Brown,evelyn.brown@example.com,2021200242,2026-05-05,Premium,North America,-10,209.69,0,
+27,Aria Moore,aria.moore@example.com,2123532673,2025-06-02,Premium,EMEA,9999,240.35,0,
+88,Riley Martin,riley.martin@example.com,4154556376,2025-10-15,Basic,EMEA,0,56.59,0,

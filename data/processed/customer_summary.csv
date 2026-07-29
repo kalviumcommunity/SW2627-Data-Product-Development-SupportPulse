@@ -1,0 +1,4 @@
+plan_type,customer_count,churn_rate,avg_monthly_spend
+Basic,34,26.5%,54.304117647058824
+Premium,23,17.4%,232.74826086956523
+Pro,63,22.2%,119.17031746031745
