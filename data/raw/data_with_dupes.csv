@@ -1,11 +1,136 @@
-customer_id,transaction_date,amount,status
-1,2025-01-15,100,completed
-1,2025-01-15,100,completed
-2,2025-01-20,250,pending
-2,2025-01-20,250,pending
-3,2025-02-01,150,completed
-4,2025-02-10,500,completed
-4,2025-02-10,500,completed
-5,2025-03-01,300,pending
-5,2025-03-01,300,pending
-6,2025-03-20,450,completed
+customer_id,name,email,phone,signup_date,plan_type,region,tenure_days,monthly_spend,churn_status,churn_date
+100,Carter Ramirez,carter.ramirez@example.com,8047767250,2026-01-21,Basic,North America,187,60.57,1,2026-04-28
+89,Alexander Brown,alexander.brown@example.com,7036227437,2024-06-24,Pro,Europe,763,145.63,0,
+110,Aria Garcia,aria.garcia@example.com,2023347479,2025-01-23,Pro,Latin America,550,133.98,1,2025-07-03
+14,Emily Smith,emily.smith@example.com,6173776200,2025-10-07,Basic,Asia Pacific,293,47.75,0,
+77,Olivia Williams,olivia.williams@example.com,8049545048,2024-07-19,Premium,North America,738,219.58,0,
+107,Avery Robinson,avery.robinson@example.com,3103122339,2026-03-05,Pro,Europe,144,109.63,1,2026-07-14
+109,Luna Williams,luna.williams@example.com,2129971807,2025-01-18,Pro,North America,555,86.96,0,
+9,Michael Williams,michael.williams@example.com,2020104468,2026-03-06,Basic,North America,143,61.69,1,2026-05-22
+64,Grace Clark,grace.clark@example.com,2120465044,2024-05-14,Premium,Latin America,804,278.96,0,
+50,Jackson Gonzalez,jackson.gonzalez@example.com,9159144527,2026-04-11,Pro,North America,107,106.33,0,
+8,Daniel Davis,daniel.davis@example.com,8046926983,2026-03-07,Pro,Europe,142,134.93,0,
+83,Avery Rodriguez,avery.rodriguez@example.com,2124968065,2026-03-01,Pro,Latin America,148,106.52,0,
+54,Zoe Rodriguez,zoe.rodriguez@example.com,7032808705,2025-02-22,Pro,North America,520,110.38,0,
+30,Isabella Sanchez,isabella.sanchez@example.com,7039901587,2024-03-17,Pro,Europe,862,116.94,0,
+27,Aria Moore,aria.moore@example.com,2123532673,2025-06-02,Premium,EMEA,420,240.35,0,
+10,Jacob Lee,jacob.lee@example.com,7032223757,2025-11-18,Pro,Europe,251,102.33,1,2026-02-24
+51,Elijah Anderson,elijah.anderson@example.com,6170530683,2025-09-13,Basic,Europe,317,74.52,0,
+72,Charlotte Robinson,charlotte.robinson@example.com,2126920439,2025-09-16,Pro,North America,314,123.44,0,
+74,Chloe Lopez,chloe.lopez@example.com,4154128665,2026-04-07,Pro,Asia Pacific,111,122.86,0,
+88,Riley Martin,riley.martin@example.com,4154556376,2025-10-15,Basic,EMEA,285,56.59,0,
+104,Carter Harris,carter.harris@example.com,9153580460,2026-02-20,Pro,North America,157,93.14,1,2026-07-24
+6,Mia Hernandez,mia.hernandez@example.com,9159223638,2025-12-16,Pro,North America,223,109.06,0,
+118,Luna Martin,luna.martin@example.com,8041406038,2025-11-05,Basic,North America,264,54.84,1,2026-04-24
+93,Hannah Lewis,hannah.lewis@example.com,7033009543,2025-02-13,Pro,Asia Pacific,529,137.77,0,
+98,Joseph Gonzalez,joseph.gonzalez@example.com,7037578424,2024-11-12,Pro,North America,622,150.58,0,
+56,Zoe Smith,zoe.smith@example.com,9152381800,2025-02-13,Pro,Europe,529,142.02,0,
+120,Riley Sanchez,riley.sanchez@example.com,6176272072,2026-06-24,Pro,Europe,33,106.46,0,
+26,Emily Rodriguez,emily.rodriguez@example.com,8045540744,2026-01-01,Basic,North America,207,63.77,1,2026-04-03
+11,Liam White,liam.white@example.com,7037307357,2024-08-19,Pro,North America,707,105.0,0,
+12,Samuel Robinson,samuel.robinson@example.com,2022828111,2024-03-19,Pro,North America,860,123.85,0,
+115,Samuel White,samuel.white@example.com,8048238951,2025-12-09,Pro,Asia Pacific,230,124.11,1,2026-01-26
+73,Michael Jones,michael.jones@example.com,6170903741,2024-07-28,Pro,EMEA,729,103.83,0,
+16,Jacob Lewis,jacob.lewis@example.com,4157140042,2024-09-23,Basic,Europe,672,77.16,0,
+95,Alexander Miller,alexander.miller@example.com,2129171304,2024-02-25,Basic,Latin America,883,50.98,0,
+69,Mason Lopez,mason.lopez@example.com,2024806441,2024-10-12,Basic,North America,653,65.82,1,2025-01-22
+76,Avery Williams,avery.williams@example.com,6172192244,2024-04-04,Premium,North America,844,192.65,0,
+40,Ethan Perez,ethan.perez@example.com,9158639417,2025-11-11,Basic,North America,258,40.94,0,
+4,Emily Miller,emily.miller@example.com,2127057431,2025-06-22,Pro,North America,400,102.93,0,
+61,Mia Jackson,mia.jackson@example.com,2128197146,2024-03-27,Basic,Asia Pacific,852,39.08,1,2024-07-23
+116,Harper Clark,harper.clark@example.com,2121102578,2024-05-31,Pro,North America,787,79.05,1,2024-09-19
+114,Layla Martinez,layla.martinez@example.com,2128489384,2025-07-04,Premium,Europe,388,251.28,1,2025-11-12
+49,Henry Lee,henry.lee@example.com,8040567981,2026-04-01,Pro,Asia Pacific,117,107.46,0,
+106,Grace Smith,grace.smith@example.com,4155373774,2024-07-07,Pro,EMEA,750,143.21,0,
+46,Scarlett Thomas,scarlett.thomas@example.com,8044428343,2025-05-06,Premium,EMEA,447,271.62,1,2025-11-12
+39,Noah Johnson,noah.johnson@example.com,2120979991,2025-11-01,Premium,Latin America,268,186.5,0,
+34,Sophia Lopez,sophia.lopez@example.com,7034699543,2025-04-11,Premium,EMEA,472,241.93,0,
+90,James Jones,james.jones@example.com,2125133550,2025-11-14,Basic,Asia Pacific,255,71.6,0,
+112,Isabella Robinson,isabella.robinson@example.com,9156044935,2025-11-03,Pro,EMEA,266,111.33,0,
+67,Luna Ramirez,luna.ramirez@example.com,4150071769,2026-04-04,Pro,North America,114,120.91,0,
+113,Victoria Smith,victoria.smith@example.com,2128056274,2025-09-20,Pro,North America,310,111.65,0,
+43,Benjamin Lopez,benjamin.lopez@example.com,6177640668,2024-10-27,Pro,North America,638,121.37,0,
+52,Lillian White,lillian.white@example.com,2025256992,2026-02-28,Basic,Europe,149,25.22,0,
+36,Chloe Wilson,chloe.wilson@example.com,3103761037,2025-08-04,Pro,Asia Pacific,357,119.38,0,
+62,Evelyn Davis,evelyn.davis@example.com,6170501049,2026-06-21,Basic,North America,36,68.86,0,
+65,Ava Martinez,ava.martinez@example.com,4152464449,2024-08-24,Premium,Europe,702,278.88,0,
+84,Harper Anderson,harper.anderson@example.com,8048038392,2025-05-28,Premium,EMEA,425,252.25,0,
+48,Aiden Thompson,aiden.thompson@example.com,4159426189,2026-03-24,Basic,Latin America,125,35.12,0,
+81,Benjamin Thompson,benjamin.thompson@example.com,4157197262,2024-07-21,Pro,EMEA,736,116.13,0,
+57,Madison Miller,madison.miller@example.com,3105526897,2026-01-14,Basic,EMEA,194,59.39,0,
+3,Hannah Davis,hannah.davis@example.com,7032149563,2024-11-15,Pro,North America,619,107.96,1,2025-09-27
+12,Samuel Robinson,samuel.robinson@example.com,2022828111,2024-03-19,Pro,North America,860,123.85,0,
+20,Jackson Anderson,jackson.anderson@example.com,8042771561,2026-01-17,Pro,Europe,191,146.06,0,
+37,Evelyn Brown,evelyn.brown@example.com,2021200242,2026-05-05,Premium,North America,83,209.69,0,
+91,Charlotte Miller,charlotte.miller@example.com,4157528179,2026-05-06,Basic,Europe,82,36.6,1,2026-07-05
+28,Noah Harris,noah.harris@example.com,6171920729,2025-07-14,Basic,Asia Pacific,378,54.42,1,2025-10-24
+71,William Thompson,william.thompson@example.com,8042138507,2024-12-27,Pro,North America,577,119.64,1,2025-09-27
+23,Wyatt Harris,wyatt.harris@example.com,7037968330,2026-05-04,Pro,North America,84,106.92,0,
+85,Benjamin Martinez,benjamin.martinez@example.com,7031351770,2025-01-12,Pro,North America,561,126.38,0,
+80,Olivia Jones,olivia.jones@example.com,6170237596,2025-06-07,Basic,Europe,415,41.24,0,
+24,Emma Jones,emma.jones@example.com,6172611652,2025-03-09,Pro,North America,505,135.28,0,
+63,Chloe Williams,chloe.williams@example.com,2128500182,2025-08-02,Basic,Latin America,359,37.56,0,
+25,Layla Miller,layla.miller@example.com,7039599503,2024-04-19,Pro,Europe,829,104.78,0,
+68,Sophia Rodriguez,sophia.rodriguez@example.com,8041552105,2026-02-01,Pro,Europe,176,113.7,1,2026-03-15
+2,Ella Anderson,ella.anderson@example.com,7030115640,2024-05-20,Premium,North America,798,193.54,0,
+13,Matthew Johnson,matthew.johnson@example.com,4152830304,2024-09-22,Basic,Europe,673,60.89,0,
+103,Mia Sanchez,mia.sanchez@example.com,2122793036,2024-07-01,Premium,Asia Pacific,756,213.34,0,
+7,Michael Lee,michael.lee@example.com,7037617088,2025-02-11,Premium,Europe,531,209.47,1,2025-05-04
+44,Sebastian Martinez,sebastian.martinez@example.com,9158003852,2024-11-01,Basic,Europe,633,51.54,0,
+47,Harper Davis,harper.davis@example.com,3106864996,2024-04-16,Premium,Latin America,832,295.47,0,
+82,Aiden Miller,aiden.miller@example.com,2126195228,2025-03-14,Basic,North America,500,45.63,0,
+98,Joseph Gonzalez,joseph.gonzalez@example.com,7037578424,2024-11-12,Pro,North America,622,150.58,0,
+119,Riley Robinson,riley.robinson@example.com,7033557060,2025-02-19,Basic,North America,523,38.56,1,2025-12-24
+87,Alexander Miller,alexander.miller@example.com,6171754804,2024-04-14,Basic,Europe,834,59.22,0,
+92,Zoe Anderson,zoe.anderson@example.com,9154595323,2024-02-12,Pro,Latin America,896,130.5,0,
+58,Isabella White,isabella.white@example.com,4157479397,2025-12-28,Basic,Latin America,211,36.04,0,
+21,Penelope Robinson,penelope.robinson@example.com,2129190708,2025-06-13,Pro,North America,409,103.68,1,2026-02-17
+112,Isabella Robinson,isabella.robinson@example.com,9156044935,2025-11-03,Pro,EMEA,266,111.33,0,
+22,Layla Lopez,layla.lopez@example.com,9155696921,2026-04-02,Premium,EMEA,116,214.94,0,
+73,Michael Jones,michael.jones@example.com,6170903741,2024-07-28,Pro,EMEA,729,103.83,0,
+2,Ella Anderson,ella.anderson@example.com,7030115640,2024-05-20,Premium,North America,798,193.54,0,
+72,Charlotte Robinson,charlotte.robinson@example.com,2126920439,2025-09-16,Pro,North America,314,123.44,0,
+45,Daniel Wilson,daniel.wilson@example.com,7033828632,2025-10-07,Premium,North America,293,235.07,0,
+27,Aria Moore,aria.moore@example.com,2123532673,2025-06-02,Premium,EMEA,420,240.35,0,
+16,Jacob Lewis,jacob.lewis@example.com,4157140042,2024-09-23,Basic,Europe,672,77.16,0,
+86,Amelia Jackson,amelia.jackson@example.com,2022984539,2025-10-10,Pro,Latin America,290,97.38,0,
+108,Wyatt Gonzalez,wyatt.gonzalez@example.com,9154397557,2025-12-01,Premium,Latin America,238,284.91,0,
+55,Ella Anderson,ella.anderson@example.com,3105945443,2025-04-02,Pro,Europe,481,144.49,0,
+96,Layla Perez,layla.perez@example.com,7030875620,2025-06-29,Pro,North America,393,158.44,0,
+105,Aria Robinson,aria.robinson@example.com,4153519490,2024-06-22,Pro,Latin America,765,126.71,0,
+15,Lucas Sanchez,lucas.sanchez@example.com,6172565552,2026-05-04,Basic,North America,84,52.19,0,
+53,Benjamin Harris,benjamin.harris@example.com,2122193786,2024-04-05,Pro,Europe,843,124.25,1,2024-10-20
+41,Joseph Brown,joseph.brown@example.com,2028483948,2024-11-26,Pro,Latin America,608,131.96,0,
+18,Riley Clark,riley.clark@example.com,3107042034,2024-05-11,Basic,Latin America,807,77.93,0,
+101,Samuel Lopez,samuel.lopez@example.com,2120800614,2024-10-04,Pro,EMEA,661,104.57,1,2025-02-08
+38,Owen Davis,owen.davis@example.com,7030791212,2024-05-28,Pro,Europe,790,142.89,0,
+99,Lillian Garcia,lillian.garcia@example.com,3104293898,2024-07-14,Pro,North America,743,139.33,0,
+9,Michael Williams,michael.williams@example.com,2020104468,2026-03-06,Basic,North America,143,61.69,1,2026-05-22
+60,Mason White,mason.white@example.com,7034325124,2024-06-23,Premium,Asia Pacific,764,206.07,0,
+110,Aria Garcia,aria.garcia@example.com,2023347479,2025-01-23,Pro,Latin America,550,133.98,1,2025-07-03
+29,Aiden Moore,aiden.moore@example.com,2129494684,2026-06-20,Basic,North America,37,70.58,0,
+102,Oliver Robinson,oliver.robinson@example.com,6177262552,2026-04-30,Pro,North America,88,114.57,0,
+1,Aria Martin,aria.martin@example.com,2026120407,2026-06-10,Basic,EMEA,47,51.6,0,
+78,Victoria Anderson,victoria.anderson@example.com,2029109898,2025-01-21,Pro,Asia Pacific,552,108.1,0,
+94,Daniel Gonzalez,daniel.gonzalez@example.com,3102051794,2025-02-07,Pro,Europe,535,125.07,0,
+79,Aiden Williams,aiden.williams@example.com,2128570930,2024-06-12,Pro,North America,775,104.03,0,
+35,Mason Anderson,mason.anderson@example.com,8043992907,2024-05-22,Pro,EMEA,796,122.76,0,
+75,Henry Perez,henry.perez@example.com,6177373782,2025-01-30,Pro,North America,543,117.93,1,2025-05-16
+32,Oliver Ramirez,oliver.ramirez@example.com,2029245840,2024-05-30,Premium,Latin America,788,205.16,0,
+20,Jackson Anderson,jackson.anderson@example.com,8042771561,2026-01-17,Pro,Europe,191,146.06,0,
+33,Penelope Ramirez,penelope.ramirez@example.com,4153499463,2024-03-15,Pro,Asia Pacific,864,101.98,0,
+117,Alexander White,alexander.white@example.com,2123547005,2025-09-23,Premium,North America,307,194.7,0,
+19,Joseph Ramirez,joseph.ramirez@example.com,6176021895,2025-03-27,Pro,Asia Pacific,487,134.87,1,2025-07-24
+111,Mason Clark,mason.clark@example.com,7039852785,2024-12-23,Pro,North America,581,145.09,0,
+59,Olivia Lopez,olivia.lopez@example.com,8041483508,2025-03-16,Basic,Europe,498,48.11,0,
+32,Oliver Ramirez,oliver.ramirez@example.com,2029245840,2024-05-30,Premium,Latin America,788,205.16,0,
+31,Lillian Johnson,lillian.johnson@example.com,3104064562,2025-08-19,Basic,EMEA,342,65.01,0,
+17,Samuel Harris,samuel.harris@example.com,2022004528,2024-04-19,Pro,North America,829,104.44,0,
+97,Carter Johnson,carter.johnson@example.com,3101478122,2025-09-21,Pro,North America,309,126.73,0,
+42,Ella Moore,ella.moore@example.com,6172023106,2026-05-08,Basic,North America,80,65.32,0,
+5,Abigail Thompson,abigail.thompson@example.com,4155085233,2026-01-04,Premium,North America,204,218.61,1,2026-06-24
+52,Lillian White,lillian.white@example.com,2025256992,2026-02-28,Basic,Europe,149,25.22,0,
+100,Carter Ramirez,carter.ramirez@example.com,8047767250,2026-01-21,Basic,North America,187,60.57,1,2026-04-28
+66,Aria Sanchez,aria.sanchez@example.com,8042048023,2026-01-28,Pro,Europe,180,108.07,0,
+70,Sebastian Smith,sebastian.smith@example.com,9152651511,2025-06-12,Premium,Latin America,410,258.24,0,
+92,Zoe Anderson,zoe.anderson@example.com,9154595323,2024-02-12,Pro,Latin America,896,130.5,0,

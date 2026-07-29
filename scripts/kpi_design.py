@@ -1,6 +1,13 @@
 import os
+import sys
+from pathlib import Path
+
 import pandas as pd
 import numpy as np
+
+ROOT_DIR = Path(__file__).resolve().parents[1]
+if str(ROOT_DIR) not in sys.path:
+    sys.path.insert(0, str(ROOT_DIR))
 
 from kpis.kpi_functions import *
 from kpis.kpi_validation import validate_kpis

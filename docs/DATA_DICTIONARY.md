@@ -1,148 +1,105 @@
-# Columns
+# Data Dictionary
 
-## customer_id
+This project contains normalized customer support and churn analytics datasets. Each dataset is designed for a production-style analytics pipeline.
 
-- Type: Integer
-- Business Meaning: Unique customer identifier
-- Example: 1001
-- Related KPI: Customer Count
-- Null Handling: Never Null
+## Raw datasets
 
----
+### customers.csv
+- `customer_id`: unique customer identifier
+- `name`: customer name
+- `email`: customer email address
+- `phone`: contact phone number
+- `signup_date`: customer onboarding date
+- `plan_type`: subscription tier or support plan
+- `region`: geographic region or market
+- `tenure_days`: days since signup
+- `monthly_spend`: recurring monthly spend amount
+- `churn_status`: binary churn indicator (1 = churned, 0 = active)
+- `churn_date`: date of churn event, if applicable
 
-## ticket_category
+### tickets.csv
+- `ticket_id`: unique ticket identifier
+- `customer_id`: foreign key to customers.csv
+- `created_date`: ticket creation date
+- `ticket_category`: support issue category
+- `priority`: ticket priority level
+- `support_channel`: support channel used
+- `escalated`: whether the ticket was escalated
+- `resolved`: whether the ticket was resolved
+- `resolution_time`: time to resolution in hours
+- `csat_score`: customer satisfaction rating 1-5
+- `within_30d_of_cancellation`: ticket occurred within 30 days before churn
 
-- Type: String
-- Business Meaning: Type of customer complaint
-- Example: Billing
-- Related KPI: Complaint Distribution
+### customer_revenue.csv
+- `customer_id`: foreign key to customers.csv
+- `monthly_revenue`: monthly revenue per customer
+- `annual_revenue`: annualized revenue per customer
 
----
+### customer_transactions.csv
+- `customer_id`: foreign key to customers.csv
+- `total_transactions`: total successful transactions
+- `purchase_count`: number of purchases
+- `total_spent`: total successful payment amount
+- `days_since_last_purchase`: days since last successful transaction
+- `average_order_value`: average amount per purchase
+- `customer_lifetime_value`: derived lifetime value estimate
 
-## resolution_time
+### transactions.csv
+- `transaction_id`: unique transaction identifier
+- `customer_id`: foreign key to customers.csv
+- `transaction_date`: date of transaction
+- `amount`: transaction amount
+- `payment_status`: transaction payment status
 
-- Type: Float
-- Business Meaning: Time taken to resolve the ticket
-- Example: 5.5
-- Related KPI: Average Resolution Time
+### missing_data.csv
+- a raw dataset containing realistic missing values for testing data imputation and validation
 
----
+### quality_test.csv
+- a raw dataset containing invalid values for data quality testing
 
-## churn
+### data_with_dupes.csv
+- a raw dataset containing duplicate customer records for deduplication testing
 
-- Type: Integer
-- Business Meaning: Indicates whether the customer churned
-- Example: 1
-- Related KPI: Churn Rate
-- Valid Values:
-  - 0 = No
-  - 1 = Yes
+### messy_text_data.csv
+- a raw dataset containing inconsistent capitalization, spacing, and formatting for text cleaning exercises
 
-  # Column to KPI Mapping
+### untyped_data.csv
+- a raw dataset with numeric fields cast to text and inconsistent date formats for type validation testing
 
-## Churn Rate
+## Processed datasets
 
-Formula:
-SUM(churn) / Total Customers
+### cleaned_customers.csv
+- cleaned and normalized customer records
 
-Related Columns:
-- churn
-- customer_id
+### cleaned_tickets.csv
+- cleaned and normalized ticket records
 
-Business Importance:
-Measures customer retention.
+### validated_data.csv
+- customer records with validation flags for email, phone, signup date, and spend
 
----
+### typed_data.csv
+- typed customer records with normalized data types
 
-## Average Resolution Time
+### deduplicated_data.csv
+- deduplicated customer records after removing duplicate keys
 
-Formula:
-AVG(resolution_time)
+### feature_engineered_data.csv
+- customer-level feature set including ticket frequency, churn risk, engagement, and spend quartile
 
-Related Columns:
-- resolution_time
+### datetime_features.csv
+- ticket-level date and time features such as weekday and days since ticket creation
 
-Business Importance:
-Measures support efficiency.
+### revenue_analysis.csv
+- revenue metrics aggregated by plan and region
 
----
+### customer_summary.csv
+- summary statistics by plan type
 
-## Ticket Volume
+### ticket_summary.csv
+- summary statistics by ticket category
 
-Formula:
-COUNT(ticket_id)
+### dashboard_metrics.csv
+- high-level dashboard KPIs for the dataset
 
-Related Columns:
-- ticket_id
-
-Business Importance:
-Tracks support workload.
-
----
-
-## Complaint Distribution
-
-Related Columns:
-- ticket_category
-
-Business Importance:
-Identifies the most common complaint categories.
-
----
-
-## Customer Satisfaction
-
-Related Columns:
-- satisfaction_score
-
-Business Importance:
-Measures customer experience.
-
-# Ambiguous Columns
-
-## churn
-
-Original Ambiguity:
-Current churn or future churn?
-
-Resolved Meaning:
-Customer cancelled the service.
-
-Suggested Rename:
-has_churned
-
----
-
-## priority
-
-Original Ambiguity:
-Business priority or ticket urgency?
-
-Resolved Meaning:
-Support ticket urgency.
-
-Suggested Rename:
-ticket_priority
-
-# Column Relationships
-
-## Resolution Time by Ticket Category
-
-Related Columns:
-- resolution_time
-- ticket_category
-
-Business Impact:
-Shows which complaint categories take longer to resolve.
-
----
-
-## Churn by Ticket Priority
-
-Related Columns:
-- priority
-- churn
-
-Business Impact:
-Determines whether unresolved high-priority tickets increase churn.
-
+### churn_report.csv
+- churn counts and rates by plan and region

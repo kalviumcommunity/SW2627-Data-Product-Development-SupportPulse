@@ -1,6 +1,26 @@
-transaction_date,signup_date,amount,revenue,is_active,is_premium
-2025-01-15,2024-01-01,$150.50,$1000.25,1,0
-2025-02-20,2024-02-15,$200.00,$2500.00,0,1
-2025-03-10,2024-03-01,$75.25,$500.75,1,1
-2025-04-18,2024-04-20,$450.00,$3200.00,0,0
-2025-05-05,2024-05-10,$125.80,$900.00,1,1
+customer_id,name,email,phone,signup_date,plan_type,region,tenure_days,monthly_spend,churn_status,churn_date
+1,Aria Martin,aria.martin@example.com,2026120407,"Jun 10, 2026",Basic,EMEA,47,51.6,0,
+2,Ella Anderson,ella.anderson@example.com,7030115640,"May 20, 2024",Premium,North America,798,193.54,0,
+3,Hannah Davis,hannah.davis@example.com,7032149563,"Nov 15, 2024",Pro,North America,619,107.96,1,27/09/2025
+4,Emily Miller,emily.miller@example.com,2127057431,"Jun 22, 2025",Pro,North America,400,102.93,0,
+5,Abigail Thompson,abigail.thompson@example.com,4155085233,"Jan 04, 2026",Premium,North America,204,218.61,1,24/06/2026
+6,Mia Hernandez,mia.hernandez@example.com,9159223638,"Dec 16, 2025",Pro,North America,223,109.06,0,
+7,Michael Lee,michael.lee@example.com,7037617088,"Feb 11, 2025",Premium,Europe,531,209.47,1,04/05/2025
+8,Daniel Davis,daniel.davis@example.com,8046926983,"Mar 07, 2026",Pro,Europe,142,134.93,0,
+9,Michael Williams,michael.williams@example.com,2020104468,"Mar 06, 2026",Basic,North America,143,61.69,1,22/05/2026
+10,Jacob Lee,jacob.lee@example.com,7032223757,"Nov 18, 2025",Pro,Europe,251,102.33,1,24/02/2026
+11,Liam White,liam.white@example.com,7037307357,"Aug 19, 2024",Pro,North America,707,105.0,0,
+12,Samuel Robinson,samuel.robinson@example.com,2022828111,"Mar 19, 2024",Pro,North America,860,123.85,0,
+13,Matthew Johnson,matthew.johnson@example.com,4152830304,"Sep 22, 2024",Basic,Europe,673,60.89,0,
+14,Emily Smith,emily.smith@example.com,6173776200,"Oct 07, 2025",Basic,Asia Pacific,293,47.75,0,
+15,Lucas Sanchez,lucas.sanchez@example.com,6172565552,"May 04, 2026",Basic,North America,84,52.19,0,
+16,Jacob Lewis,jacob.lewis@example.com,4157140042,"Sep 23, 2024",Basic,Europe,672,77.16,0,
+17,Samuel Harris,samuel.harris@example.com,2022004528,"Apr 19, 2024",Pro,North America,829,104.44,0,
+18,Riley Clark,riley.clark@example.com,3107042034,"May 11, 2024",Basic,Latin America,807,77.93,0,
+19,Joseph Ramirez,joseph.ramirez@example.com,6176021895,"Mar 27, 2025",Pro,Asia Pacific,487,134.87,1,24/07/2025
+20,Jackson Anderson,jackson.anderson@example.com,8042771561,"Jan 17, 2026",Pro,Europe,191,146.06,0,
+21,Penelope Robinson,penelope.robinson@example.com,2129190708,"Jun 13, 2025",Pro,North America,409,103.68,1,17/02/2026
+22,Layla Lopez,layla.lopez@example.com,9155696921,"Apr 02, 2026",Premium,EMEA,116,214.94,0,
+23,Wyatt Harris,wyatt.harris@example.com,7037968330,"May 04, 2026",Pro,North America,84,106.92,0,
+24,Emma Jones,emma.jones@example.com,6172611652,"Mar 09, 2025",Pro,North America,505,135.28,0,
+25,Layla Miller,layla.miller@example.com,7039599503,"Apr 19, 2024",Pro,Europe,829,104.78,0,
