@@ -329,7 +329,8 @@ elif selected == "Support Tickets":
         escalated_color = "#EF4444" if t["escalated"] == "Yes" else "#6B7280"
         
 
-        
+
+
         st.markdown(f"""
                 <tr style="border-bottom: 1px solid #F3F4F6;">
                     <td style="padding: 12px 16px; color: #2563EB; font-weight: bold;">{t['id']}</td>
@@ -345,6 +346,8 @@ elif selected == "Support Tickets":
         """, unsafe_allow_html=True)
 
     st.markdown("</table></div>", unsafe_allow_html=True)
+
+
 
 # ==========================================
 # OTHER PAGES PLACEHOLDER
