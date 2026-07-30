@@ -2,11 +2,28 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 from streamlit_option_menu import option_menu
+import streamlit as st
 
 st.set_page_config(
     page_title="ChurnGuard",
+    page_icon="🛡️",
     layout="wide",
-    initial_sidebar_state="expanded"
+    initial_sidebar_state="expanded",
+)
+
+st.markdown("""
+<style>
+[data-testid="stSidebarNav"] {
+    display: none;
+}
+</style>
+""", unsafe_allow_html=True)
+
+st.set_page_config(
+    page_title="ChurnGuard",
+    page_icon="🛡️",
+    layout="wide",
+    initial_sidebar_state="expanded",
 )
 
 # ---------------- CSS Styles ----------------
@@ -327,9 +344,6 @@ elif selected == "Support Tickets":
         priority_color = "#EF4444" if t["priority"] in ["Critical", "High"] else "#F59E0B"
         status_color = "#EF4444" if t["status"] == "Escalated" else "#3B82F6"
         escalated_color = "#EF4444" if t["escalated"] == "Yes" else "#6B7280"
-        
-
-
 
         st.markdown(f"""
                 <tr style="border-bottom: 1px solid #F3F4F6;">
@@ -347,7 +361,142 @@ elif selected == "Support Tickets":
 
     st.markdown("</table></div>", unsafe_allow_html=True)
 
+# ==========================================
+# PAGE: AI CHURN PREDICTION
+# ==========================================
+elif selected == "AI Churn Prediction":
+    col_title, col_btns = st.columns([3, 1])
+    with col_title:
+        st.markdown("<h1 style='color:#000000; font-size:40px; margin-bottom:0px; font-weight:700;'>AI Churn Prediction</h1>", unsafe_allow_html=True)
+        st.caption("Powered by gradient boosting ensemble — last trained Dec 12, 2023")
+    with col_btns:
+        b1, b2 = st.columns(2)
+        with b1:
+            st.button("🔄 Retrain Model", use_container_width=True)
+        with b2:
+            st.button("⚡ Run Batch", type="primary", use_container_width=True)
 
+    st.markdown("---")
+
+    m1, m2, m3, m4 = st.columns(4)
+    with m1:
+        st.markdown('''<div class="metric-card"><div class="metric-title">Model Accuracy</div><div class="metric-value">94.2%</div></div>''', unsafe_allow_html=True)
+    with m2:
+        st.markdown('''<div class="metric-card"><div class="metric-title">Customers Analyzed</div><div class="metric-value">1,247</div></div>''', unsafe_allow_html=True)
+    with m3:
+        st.markdown('''<div class="metric-card"><div class="metric-title">High Risk (>70%)</div><div class="metric-value" style="color:#ef4444;">38</div></div>''', unsafe_allow_html=True)
+    with m4:
+        st.markdown('''<div class="metric-card"><div class="metric-title">Revenue at Risk</div><div class="metric-value" style="color:#f97316;">$284K</div></div>''', unsafe_allow_html=True)
+
+    st.write("")
+    left_col, right_col = st.columns([1, 2])
+
+    with left_col:
+        st.markdown("### Select Customer")
+        customers_list = [
+            {"name": "DataStream Analytics", "ind": "Analytics", "risk": 91},
+            {"name": "Acme Corporation", "ind": "Manufacturing", "risk": 87},
+            {"name": "TechFlow Solutions", "ind": "Technology", "risk": 72},
+            {"name": "EduLearn Platform", "ind": "Education", "risk": 65},
+            {"name": "GlobalRetail Inc", "ind": "Retail", "risk": 58},
+            {"name": "LegalEagle Firm", "ind": "Legal", "risk": 44},
+            {"name": "HealthBridge Partners", "ind": "Healthcare", "risk": 18},
+            {"name": "FinanceFirst Corp", "ind": "Finance", "risk": 12},
+        ]
+        for c in customers_list:
+            bg_col = "#eff6ff" if c["name"] == "DataStream Analytics" else "#ffffff"
+            risk_col = "#ef4444" if c["risk"] > 70 else ("#f97316" if c["risk"] > 50 else "#22c55e")
+            st.markdown(f'''
+                <div style="background-color: {bg_col}; padding: 12px; border-radius: 10px; margin-bottom: 8px; border: 1px solid #ededed; display: flex; justify-content: space-between; align-items: center;">
+                    <div><b>{c['name']}</b><br><span style="font-size: 11px; color: #6b7280;">{c['ind']}</span></div>
+                    <div style="font-weight: bold; color: {risk_col};">{c['risk']}%</div>
+                </div>
+            ''', unsafe_allow_html=True)
+
+    with right_col:
+        st.markdown('''
+            <div style="background: white; padding: 20px; border-radius: 12px; border: 1px solid #ededed;">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <h3 style="margin: 0; display: inline-block;">DataStream Analytics</h3>
+                        <span style="background-color: #fee2e2; color: #991b1b; padding: 2px 8px; border-radius: 12px; font-size: 11px; font-weight: bold; margin-left: 8px;">Critical</span>
+                        <p style="color: #6b7280; font-size: 13px; margin: 4px 0 0 0;">Startup • Analytics • MRR: $2,000</p>
+                    </div>
+                    <div style="text-align: right;">
+                        <span style="font-size: 11px; color: #6b7280;">Prediction confidence</span><br>
+                        <span style="font-size: 20px; font-weight: bold; color: #0f172a;">94.2%</span>
+                    </div>
+                </div>
+            </div>
+        ''', unsafe_allow_html=True)
+        
+        st.write("")
+        st.markdown("### Reasons Behind Prediction")
+        r1, r2 = st.columns(2)
+        with r1:
+            st.info("🕒 Late ticket resolution")
+            st.info("🔄 Repeated complaints")
+            st.info("⚡ Usage drop >30%")
+        with r2:
+            st.warning("💬 Negative sentiment trend")
+            st.warning("📉 Multiple escalations")
+            st.warning("📅 Short account age")
+
+# ==========================================
+# PAGE: RISK ANALYSIS
+# ==========================================
+elif selected == "Risk Analysis":
+    st.markdown("<h1 style='color:#000000; font-size:40px; margin-bottom:0px; font-weight:700;'>Risk Analysis</h1>", unsafe_allow_html=True)
+    st.caption("Department-level risk distribution and root cause analysis")
+
+    f1, f2, f3, f4 = st.columns(4)
+    with f1: st.selectbox("Time", ["All", "Q1 2026", "Q4 2025"], label_visibility="collapsed")
+    with f2: st.selectbox("Product", ["All", "Core Engine", "Analytics"], label_visibility="collapsed")
+    with f3: st.selectbox("Region", ["All", "North America", "EMEA"], label_visibility="collapsed")
+    with f4: st.selectbox("Priority", ["All", "High", "Medium", "Low"], label_visibility="collapsed")
+
+    st.write("")
+    col_heatmap, col_categories = st.columns([3, 2])
+
+    with col_heatmap:
+        st.markdown("### Department Risk Heatmap")
+        dept_data = {
+            "Department": ["Billing", "Technical", "Onboarding", "Account Mgmt", "Product"],
+            "Low": [5, 8, 3, 12, 9],
+            "Medium": [12, 9, 7, 6, 8],
+            "High": [8, 6, 11, 4, 5],
+            "Critical": [3, 2, 5, 1, 0]
+        }
+        df_dept = pd.DataFrame(dept_data).set_index("Department")
+        st.bar_chart(df_dept, stack=True, color=["#22c55e", "#fbbf24", "#f97316", "#ef4444"])
+
+    with col_categories:
+        st.markdown("### Complaint Categories")
+        cat_data = pd.DataFrame({
+            "Issues": ["Billing", "Performance", "Integration", "Feature Request", "Onboarding", "Other"],
+            "Count": [28, 23, 19, 17, 9, 4]
+        }).set_index("Issues")
+        st.bar_chart(cat_data, horizontal=True, color="#ef4444")
+
+    st.write("")
+    col_trend, col_root = st.columns([3, 2])
+
+    with col_trend:
+        st.markdown("### Escalation Trend")
+        trend_data = pd.DataFrame({
+            "Month": ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
+            "Escalation Rate (%)": [9.0, 9.5, 8.5, 11.2, 13.5, 15.0]
+        }).set_index("Month")
+        st.line_chart(trend_data, color="#ef4444")
+
+    with col_root:
+        st.markdown("### Root Cause Analysis")
+        st.markdown("""
+            * **Unresolved billing disputes** — 28 customers (**34%**)
+            * **Slow technical support** — 22 customers (**28%**)
+            * **Onboarding gaps** — 17 customers (**21%**)
+            * **Missing product features** — 9 customers (**12%**)
+        """)
 
 # ==========================================
 # OTHER PAGES PLACEHOLDER
