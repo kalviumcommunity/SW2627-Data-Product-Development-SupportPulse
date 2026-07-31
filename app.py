@@ -3,11 +3,32 @@ import pandas as pd
 import plotly.express as px
 from streamlit_option_menu import option_menu
 
+import os
+
+metrics = pd.read_csv("output/dashboard_metrics.csv")
+
+customers = pd.read_csv(
+    "data/processed/feature_engineered_customers.csv"
+)
+
+tickets = pd.read_csv(
+    "data/processed/feature_engineered_tickets.csv"
+)
+
 st.set_page_config(
     page_title="ChurnGuard",
+    page_icon="🛡️",
     layout="wide",
-    initial_sidebar_state="expanded"
+    initial_sidebar_state="expanded",
 )
+
+st.markdown("""
+<style>
+[data-testid="stSidebarNav"] {
+    display: none;
+}
+</style>
+""", unsafe_allow_html=True)
 
 # ---------------- CSS Styles ----------------
 st.markdown("""
@@ -61,6 +82,37 @@ header {visibility:hidden;}
     border-radius: 12px;
     overflow: hidden;
     box-shadow: 0px 1px 6px rgba(0,0,0,.05);
+}
+/* Make all text black */
+html, body, .stApp,
+p, span, div, label,
+h1, h2, h3, h4, h5, h6 {
+    color: #000000 !important;
+}
+
+/* Streamlit widgets */
+.stTextInput input,
+.stSelectbox,
+.stSelectbox div,
+.stMultiSelect,
+.stButton button,
+.stMarkdown,
+.stCaption,
+.stMetric,
+.stDataFrame,
+.stTable {
+    color: #000000 !important;
+}
+
+/* Placeholder text */
+input::placeholder {
+    color: #000000 !important;
+    opacity: 1;
+}
+
+/* Dropdown selected value */
+[data-baseweb="select"] div {
+    color: #000000 !important;
 }
 </style>
 """, unsafe_allow_html=True)
@@ -151,18 +203,19 @@ with col3:
 # PAGE: DASHBOARD
 # ==========================================
 if selected == "Dashboard":
-    st.markdown("""
-    <h1 style="color:#000000; font-size:40px; margin-bottom:0px; font-weight:700;">Dashboard</h1>
-    <p style="color:#6B7280; font-size:16px; margin-top:0px;">Overview of churn risk and support health — Dec 2023</p>
-    """, unsafe_allow_html=True)
+
+    st.markdown(...)
 
     cards = st.columns(5)
+
+    metric_dict = dict(zip(metrics["Metric"], metrics["Value"]))
+
     values = [
-        ("👥", "1,247", "Total Customers", "+12 this month", "red"),
-        ("📂", "84", "Open Tickets", "+8 vs last week", "red"),
-        ("⚠", "5.5%", "Predicted Churn", "+0.3%", "red"),
-        ("✅", "23", "Resolved Today", "-5 vs yesterday", "green"),
-        ("🕒", "2.4d", "Avg Resolution", "+0.3d", "red")
+        ("👥", int(metric_dict["Total Customers"]), "Total Customers", "", "green"),
+        ("🎫", int(metric_dict["Total Tickets"]), "Total Tickets", "", "green"),
+        ("⚠", f'{metric_dict["Churn Rate (%)"]}%', "Churn Rate", "", "red"),
+        ("✅", f'{metric_dict["Resolution Rate (%)"]}%', "Resolution Rate", "", "green"),
+        ("🕒", f'{metric_dict["Average Resolution Time"]} hrs', "Avg Resolution", "", "red")
     ]
 
     for col, (icon, val, title, change, color) in zip(cards, values):
@@ -180,31 +233,65 @@ if selected == "Dashboard":
     st.write("")
 
     left, right = st.columns([2.2, 1])
-    months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
-    actual = [2, 2.1, 2.0, 2.8, 3, 2.4, 3.2, 3.7, 3.6, 4.2, 4.8, 5.4]
-    df = pd.DataFrame({"Month": months, "Actual": actual})
+
+    customers["signup_date"] = pd.to_datetime(customers["signup_date"])
+
+    trend = (
+        customers.groupby(customers["signup_date"].dt.to_period("M"))
+        .size()
+        .reset_index(name="Customers")
+    )
+
+    trend["signup_date"] = trend["signup_date"].astype(str)
 
     with left:
-        st.markdown("### Monthly Churn Trend")
-        fig = px.line(df, x="Month", y="Actual", markers=False)
-        fig.update_layout(
-            height=420, plot_bgcolor="white", paper_bgcolor="white",
-            margin=dict(l=10, r=10, t=10, b=10), xaxis_title="", yaxis_title=""
+        st.markdown("### Monthly Customer Trend")
+
+        fig = px.line(
+            trend,
+            x="signup_date",
+            y="Customers",
+            markers=True
         )
+
+        fig.update_layout(
+            height=420,
+            plot_bgcolor="white",
+            paper_bgcolor="white",
+            margin=dict(l=10, r=10, t=10, b=10),
+            xaxis_title="",
+            yaxis_title=""
+        )
+
         fig.update_traces(line=dict(width=4, color="#2563EB"))
+
         st.plotly_chart(fig, use_container_width=True)
 
     with right:
         st.markdown("### Complaint Categories")
-        pie = pd.DataFrame({
-            "Category": ["Billing", "Performance", "Integration", "Feature Request", "Onboarding", "Other"],
-            "Value": [28, 22, 19, 16, 10, 5]
-        })
-        fig2 = px.pie(pie, names="Category", values="Value", hole=.72)
-        fig2.update_layout(
-            height=420, paper_bgcolor="white",
-            margin=dict(l=0, r=0, t=10, b=0), showlegend=True
+
+        pie = (
+            tickets["ticket_category"]
+            .value_counts()
+            .reset_index()
         )
+
+        pie.columns = ["Category", "Value"]
+
+        fig2 = px.pie(
+            pie,
+            names="Category",
+            values="Value",
+            hole=0.72
+        )
+
+        fig2.update_layout(
+            height=420,
+            paper_bgcolor="white",
+            margin=dict(l=0, r=0, t=10, b=0),
+            showlegend=True
+        )
+
         st.plotly_chart(fig2, use_container_width=True)
 
 # ==========================================
@@ -228,16 +315,7 @@ elif selected == "Customers":
 
     st.write("")
 
-    customers_data = [
-        {"name": "Acme Corporation", "contact": "James Mitchell", "industry": "Manufacturing", "region": "North America", "tickets": 8, "resolution": "4.2d", "escalations": 3, "risk": "87% • Critical", "health": 23, "status": "Critical"},
-        {"name": "TechFlow Solutions", "contact": "Sarah Chen", "industry": "Technology", "region": "Asia Pacific", "tickets": 5, "resolution": "2.8d", "escalations": 2, "risk": "72% • Critical", "health": 38, "status": "High Risk"},
-        {"name": "GlobalRetail Inc", "contact": "Michael Torres", "industry": "Retail", "region": "Europe", "tickets": 3, "resolution": "1.9d", "escalations": 1, "risk": "58% • Medium", "health": 55, "status": "Medium Risk"},
-        {"name": "HealthBridge Partners", "contact": "Emily Watson", "industry": "Healthcare", "region": "North America", "tickets": 1, "resolution": "0.8d", "escalations": 0, "risk": "18% • Low", "health": 89, "status": "Healthy"},
-        {"name": "DataStream Analytics", "contact": "Robert Kim", "industry": "Analytics", "region": "North America", "tickets": 6, "resolution": "3.5d", "escalations": 4, "risk": "91% • Critical", "health": 12, "status": "Critical"},
-        {"name": "LegalEagle Firm", "contact": "Amanda Foster", "industry": "Legal", "region": "Europe", "tickets": 2, "resolution": "2.1d", "escalations": 1, "risk": "44% • Medium", "health": 67, "status": "Low Risk"},
-        {"name": "EduLearn Platform", "contact": "David Park", "industry": "Education", "region": "Asia Pacific", "tickets": 4, "resolution": "2.9d", "escalations": 2, "risk": "65% • Medium", "health": 44, "status": "Medium Risk"},
-        {"name": "FinanceFirst Corp", "contact": "Linda Garcia", "industry": "Finance", "region": "North America", "tickets": 0, "resolution": "1.2d", "escalations": 0, "risk": "12% • Low", "health": 94, "status": "Healthy"}
-    ]
+    customers_data = customers.copy()
 
     st.markdown("""
         <div class="custom-table">
@@ -255,24 +333,37 @@ elif selected == "Customers":
                 </tr>
     """, unsafe_allow_html=True)
 
-    for c in customers_data:
-        status_color = "#EF4444" if c["status"] == "Critical" else ("#F97316" if "Risk" in c["status"] else "#22C55E")
-        risk_color = "#EF4444" if "Critical" in c["risk"] else ("#F59E0B" if "Medium" in c["risk"] else "#22C55E")
+    for _, c in customers_data.iterrows():
+        status_color = "#EF4444" if c["churn_status"] == 1 else "#22C55E"
+        risk_color = "#EF4444" if c["churn_status"] == 1 else "#22C55E"
         
         st.markdown(f"""
                 <tr style="border-bottom: 1px solid #F3F4F6;">
                     <td style="padding: 12px 16px;">
-                        <b>{c['name']}</b><br><span style="font-size: 11px; color: #6B7280;">{c['contact']}</span>
+                        <b>{c['name']}</b><br><span style="font-size: 11px; color: #6B7280;">{c["email"]}</span>
                     </td>
                     <td style="padding: 12px 16px; color: #4B5563;">
-                        {c['industry']}<br><span style="font-size: 11px; color: #9CA3AF;">{c['region']}</span>
+                        {c["plan_type"]}<br><span style="font-size: 11px; color: #9CA3AF;">{c['region']}</span>
                     </td>
-                    <td style="padding: 12px 16px; color: #EF4444; font-weight: bold;">{c['tickets']}</td>
-                    <td style="padding: 12px 16px; color: #4B5563;">{c['resolution']}</td>
-                    <td style="padding: 12px 16px; color: #EF4444; font-weight: bold;">{c['escalations']}</td>
-                    <td style="padding: 12px 16px;"><span style="background: #FEF2F2; color: {risk_color}; padding: 3px 8px; border-radius: 12px; font-size: 11px; font-weight: bold;">{c['risk']}</span></td>
-                    <td style="padding: 12px 16px; color: #374151;">{c['health']}</td>
-                    <td style="padding: 12px 16px;"><span style="background: #FEE2E2; color: {status_color}; padding: 3px 8px; border-radius: 12px; font-size: 11px; font-weight: bold;">{c['status']}</span></td>
+                    <td style="padding: 12px 16px; color: #EF4444; font-weight: bold;">{tickets[
+tickets.customer_id == c.customer_id
+].shape[0]}</td>
+                    <td style="padding: 12px 16px; color: #4B5563;">{round(
+tickets[
+tickets.customer_id==c.customer_id
+]["resolution_time"].mean(),
+1
+)}</td>
+                    <td style="padding: 12px 16px; color: #EF4444; font-weight: bold;">{tickets[
+(tickets.customer_id==c.customer_id)
+&
+(tickets.escalated==True)
+].shape[0]}</td>
+                    <td style="padding: 12px 16px;"><span style="background: #FEF2F2; color: {risk_color}; padding: 3px 8px; border-radius: 12px; font-size: 11px; font-weight: bold;">{"High" if c["churn_status"]==1 else "Low"}</span></td>
+                    <td style="padding: 12px 16px; color: #374151;">{max(0,100-int(c["tenure_days"]//10))}</td>
+                    <td style="padding: 12px 16px;"><span style="background: #FEE2E2; color: {status_color}; padding: 3px 8px; border-radius: 12px; font-size: 11px; font-weight: bold;">{"Churned"
+if c["churn_status"]==1
+else "Active"}</span></td>
                     <td style="padding: 12px 16px; color: #9CA3AF;">›</td>
                 </tr>
         """, unsafe_allow_html=True)
@@ -296,16 +387,7 @@ elif selected == "Support Tickets":
 
     st.write("")
 
-    tickets_data = [
-        {"id": "TKT-2847", "customer": "Acme Corporation", "category": "Billing Dispute", "priority": "High", "status": "Open", "agent": "Sarah M.", "resolution": "Overdue (8d)", "escalated": "Yes", "sentiment": "Negative"},
-        {"id": "TKT-2843", "customer": "DataStream Analytics", "category": "API Integration Failure", "priority": "Critical", "status": "Escalated", "agent": "Tom R.", "resolution": "Overdue (12d)", "escalated": "Yes", "sentiment": "Very Negative"},
-        {"id": "TKT-2839", "customer": "TechFlow Solutions", "category": "Performance Degradation", "priority": "High", "status": "In Progress", "agent": "Emma L.", "resolution": "3d", "escalated": "No", "sentiment": "Neutral"},
-        {"id": "TKT-2834", "customer": "GlobalRetail Inc", "category": "Pricing Inquiry", "priority": "Medium", "status": "Open", "agent": "Unassigned", "resolution": "12d", "escalated": "No", "sentiment": "Neutral"},
-        {"id": "TKT-2829", "customer": "EduLearn Platform", "category": "LMS Integration", "priority": "High", "status": "In Progress", "agent": "Chris K.", "resolution": "5d", "escalated": "No", "sentiment": "Neutral"},
-        {"id": "TKT-2821", "customer": "LegalEagle Firm", "category": "Compliance Feature", "priority": "Medium", "status": "Pending", "agent": "Sarah M.", "resolution": "4d", "escalated": "Yes", "sentiment": "Neutral"},
-        {"id": "TKT-2815", "customer": "DataStream Analytics", "category": "Onboarding Blockers", "priority": "Critical", "status": "Open", "agent": "Tom R.", "resolution": "Overdue (21d)", "escalated": "Yes", "sentiment": "Very Negative"},
-        {"id": "TKT-2801", "customer": "Acme Corporation", "category": "Data Export Error", "priority": "High", "status": "In Progress", "agent": "Emma L.", "resolution": "2d", "escalated": "No", "sentiment": "Negative"}
-    ]
+    tickets_data = tickets.copy()
 
     st.markdown("""
         <div class="custom-table">
@@ -323,31 +405,309 @@ elif selected == "Support Tickets":
                 </tr>
     """, unsafe_allow_html=True)
 
-    for t in tickets_data:
+    for _, t in tickets_data.iterrows():
         priority_color = "#EF4444" if t["priority"] in ["Critical", "High"] else "#F59E0B"
-        status_color = "#EF4444" if t["status"] == "Escalated" else "#3B82F6"
+        status_color = "#22C55E" if t["resolved"] else "#EF4444"
         escalated_color = "#EF4444" if t["escalated"] == "Yes" else "#6B7280"
-        
-
-
 
         st.markdown(f"""
                 <tr style="border-bottom: 1px solid #F3F4F6;">
-                    <td style="padding: 12px 16px; color: #2563EB; font-weight: bold;">{t['id']}</td>
-                    <td style="padding: 12px 16px; font-weight: 500;">{t['customer']}</td>
-                    <td style="padding: 12px 16px; color: #4B5563;">{t['category']}</td>
+                    <td style="padding: 12px 16px; color: #2563EB; font-weight: bold;">{t["ticket_id"]}</td>
+                    <td style="padding: 12px 16px; font-weight: 500;">{customers.loc[
+customers.customer_id==t.customer_id,
+"name"
+].values[0]}</td>
+                    <td style="padding: 12px 16px; color: #4B5563;">{t["ticket_category"]}</td>
                     <td style="padding: 12px 16px; color: {priority_color}; font-weight: bold;">{t['priority']}</td>
-                    <td style="padding: 12px 16px;"><span style="background: #EFF6FF; color: {status_color}; padding: 3px 8px; border-radius: 12px; font-size: 11px; font-weight: bold;">{t['status']}</span></td>
-                    <td style="padding: 12px 16px; color: #4B5563;">{t['agent']}</td>
-                    <td style="padding: 12px 16px; color: #EF4444;">{t['resolution']}</td>
-                    <td style="padding: 12px 16px; color: {escalated_color}; font-weight: bold;">{t['escalated']}</td>
-                    <td style="padding: 12px 16px; color: #EF4444;">{t['sentiment']}</td>
+                    <td style="padding: 12px 16px;"><span style="background: #EFF6FF; color: {status_color}; padding: 3px 8px; border-radius: 12px; font-size: 11px; font-weight: bold;">{"Resolved"
+if t["resolved"]
+else "Open"}</span></td>
+                    <td style="padding: 12px 16px; color: #4B5563;">Support Team</td>
+                    <td style="padding: 12px 16px; color: #EF4444;">{f'{t["resolution_time"]} hrs'}</td>
+                    <td style="padding: 12px 16px; color: {escalated_color}; font-weight: bold;">{"Yes"
+if t["escalated"]
+else "No"}</td>
+                    <td style="padding: 12px 16px; color: #EF4444;">Neutral</td>
                 </tr>
         """, unsafe_allow_html=True)
 
     st.markdown("</table></div>", unsafe_allow_html=True)
 
+# ==========================================
+# PAGE: AI CHURN PREDICTION
+# ==========================================
+elif selected == "AI Churn Prediction":
+    col_title, col_btns = st.columns([3, 1])
+    with col_title:
+        st.markdown("<h1 style='color:#000000; font-size:40px; margin-bottom:0px; font-weight:700;'>AI Churn Prediction</h1>", unsafe_allow_html=True)
+        st.caption("Powered by gradient boosting ensemble — last trained Dec 12, 2023")
+    with col_btns:
+        b1, b2 = st.columns(2)
+        with b1:
+            st.button("🔄 Retrain Model", use_container_width=True)
+        with b2:
+            st.button("⚡ Run Batch", type="primary", use_container_width=True)
 
+    st.markdown("---")
+
+    m1, m2, m3, m4 = st.columns(4)
+    with m1:
+        st.markdown('''<div class="metric-card"><div class="metric-title">Model Accuracy</div><div class="metric-value">94.2%</div></div>''', unsafe_allow_html=True)
+    with m2:
+        st.markdown('''<div class="metric-card"><div class="metric-title">Customers Analyzed</div><div class="metric-value">1,247</div></div>''', unsafe_allow_html=True)
+    with m3:
+        st.markdown('''<div class="metric-card"><div class="metric-title">High Risk (>70%)</div><div class="metric-value" style="color:#ef4444;">38</div></div>''', unsafe_allow_html=True)
+    with m4:
+        st.markdown('''<div class="metric-card"><div class="metric-title">Revenue at Risk</div><div class="metric-value" style="color:#f97316;">$284K</div></div>''', unsafe_allow_html=True)
+
+    st.write("")
+    left_col, right_col = st.columns([1, 2])
+
+    with left_col:
+        st.markdown("### Select Customer")
+        customers_list = [
+            {"name": "DataStream Analytics", "ind": "Analytics", "risk": 91},
+            {"name": "Acme Corporation", "ind": "Manufacturing", "risk": 87},
+            {"name": "TechFlow Solutions", "ind": "Technology", "risk": 72},
+            {"name": "EduLearn Platform", "ind": "Education", "risk": 65},
+            {"name": "GlobalRetail Inc", "ind": "Retail", "risk": 58},
+            {"name": "LegalEagle Firm", "ind": "Legal", "risk": 44},
+            {"name": "HealthBridge Partners", "ind": "Healthcare", "risk": 18},
+            {"name": "FinanceFirst Corp", "ind": "Finance", "risk": 12},
+        ]
+        for c in customers_list:
+            bg_col = "#eff6ff" if c["name"] == "DataStream Analytics" else "#ffffff"
+            risk_col = "#ef4444" if c["risk"] > 70 else ("#f97316" if c["risk"] > 50 else "#22c55e")
+            st.markdown(f'''
+                <div style="background-color: {bg_col}; padding: 12px; border-radius: 10px; margin-bottom: 8px; border: 1px solid #ededed; display: flex; justify-content: space-between; align-items: center;">
+                    <div><b>{c['name']}</b><br><span style="font-size: 11px; color: #6b7280;">{c['ind']}</span></div>
+                    <div style="font-weight: bold; color: {risk_col};">{"High" if c["churn_status"]==1 else "Low"}%</div>
+                </div>
+            ''', unsafe_allow_html=True)
+
+    with right_col:
+        st.markdown('''
+            <div style="background: white; padding: 20px; border-radius: 12px; border: 1px solid #ededed;">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <h3 style="margin: 0; display: inline-block;">DataStream Analytics</h3>
+                        <span style="background-color: #fee2e2; color: #991b1b; padding: 2px 8px; border-radius: 12px; font-size: 11px; font-weight: bold; margin-left: 8px;">Critical</span>
+                        <p style="color: #6b7280; font-size: 13px; margin: 4px 0 0 0;">Startup • Analytics • MRR: $2,000</p>
+                    </div>
+                    <div style="text-align: right;">
+                        <span style="font-size: 11px; color: #6b7280;">Prediction confidence</span><br>
+                        <span style="font-size: 20px; font-weight: bold; color: #0f172a;">94.2%</span>
+                    </div>
+                </div>
+            </div>
+        ''', unsafe_allow_html=True)
+        
+        st.write("")
+        st.markdown("### Reasons Behind Prediction")
+        r1, r2 = st.columns(2)
+        with r1:
+            st.info("🕒 Late ticket resolution")
+            st.info("🔄 Repeated complaints")
+            st.info("⚡ Usage drop >30%")
+        with r2:
+            st.warning("💬 Negative sentiment trend")
+            st.warning("📉 Multiple escalations")
+            st.warning("📅 Short account age")
+
+# ==========================================
+# PAGE: RISK ANALYSIS
+# ==========================================
+elif selected == "Risk Analysis":
+    st.markdown("<h1 style='color:#000000; font-size:40px; margin-bottom:0px; font-weight:700;'>Risk Analysis</h1>", unsafe_allow_html=True)
+    st.caption("Department-level risk distribution and root cause analysis")
+
+    f1, f2, f3, f4 = st.columns(4)
+    with f1: st.selectbox("Time", ["All", "Q1 2026", "Q4 2025"], label_visibility="collapsed")
+    with f2: st.selectbox("Product", ["All", "Core Engine", "Analytics"], label_visibility="collapsed")
+    with f3: st.selectbox("Region", ["All", "North America", "EMEA"], label_visibility="collapsed")
+    with f4: st.selectbox("Priority", ["All", "High", "Medium", "Low"], label_visibility="collapsed")
+
+    st.write("")
+    col_heatmap, col_categories = st.columns([3, 2])
+
+    with col_heatmap:
+        st.markdown("### Department Risk Heatmap")
+        dept_data = {
+            "Department": ["Billing", "Technical", "Onboarding", "Account Mgmt", "Product"],
+            "Low": [5, 8, 3, 12, 9],
+            "Medium": [12, 9, 7, 6, 8],
+            "High": [8, 6, 11, 4, 5],
+            "Critical": [3, 2, 5, 1, 0]
+        }
+        df_dept = pd.DataFrame(dept_data).set_index("Department")
+        st.bar_chart(df_dept, stack=True, color=["#22c55e", "#fbbf24", "#f97316", "#ef4444"])
+
+    with col_categories:
+        st.markdown("### Complaint Categories")
+        cat_data = pd.DataFrame({
+            "Issues": ["Billing", "Performance", "Integration", "Feature Request", "Onboarding", "Other"],
+            "Count": [28, 23, 19, 17, 9, 4]
+        }).set_index("Issues")
+        st.bar_chart(cat_data, horizontal=True, color="#ef4444")
+
+    st.write("")
+    col_trend, col_root = st.columns([3, 2])
+
+    with col_trend:
+        st.markdown("### Escalation Trend")
+        trend_data = pd.DataFrame({
+            "Month": ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
+            "Escalation Rate (%)": [9.0, 9.5, 8.5, 11.2, 13.5, 15.0]
+        }).set_index("Month")
+        st.line_chart(trend_data, color="#ef4444")
+
+    with col_root:
+        st.markdown("### Root Cause Analysis")
+        st.markdown("""
+            * **Unresolved billing disputes** — 28 customers (**34%**)
+            * **Slow technical support** — 22 customers (**28%**)
+            * **Onboarding gaps** — 17 customers (**21%**)
+            * **Missing product features** — 9 customers (**12%**)
+        """)
+
+# ==========================================
+# PAGE: ESCALATIONS
+# ==========================================
+elif selected == "Escalations":
+    col_title, col_search, col_actions = st.columns([2, 2, 1])
+    with col_title:
+        st.markdown("## Escalations")
+        st.caption("4 active escalations requiring attention")
+    with col_search:
+        st.text_input("Search esc", placeholder="🔍 Search customers, tickets...", label_visibility="collapsed")
+    with col_actions:
+        cols_btn = st.columns(2)
+        with cols_btn[0]:
+            st.markdown("🔔")
+        with cols_btn[1]:
+            st.button("📥 Export", use_container_width=True)
+
+    st.markdown("---")
+
+    m1, m2, m3 = st.columns(3)
+    with m1:
+        st.metric(label="Critical Escalations", value="2", delta="Action Required", delta_color="inverse")
+    with m2:
+        st.metric(label="Overdue Tickets", value="3")
+    with m3:
+        st.metric(label="Unassigned", value="0")
+
+    st.markdown("<br>", unsafe_allow_html=True)
+
+    data = {
+        "Ticket ID": ["TKT-2847", "TKT-2843", "TKT-2821", "TKT-2815"],
+        "Customer": ["Acme Corporation", "DataStream Analytics", "LegalEagle Firm", "DataStream Analytics"],
+        "Issue": ["Billing Dispute", "API Integration Failure", "Compliance Feature", "Onboarding Blockers"],
+        "Priority": ["High", "Critical", "Medium", "Critical"],
+        "Status": ["Open", "Escalated", "Pending", "Open"],
+        "Agent": ["Sarah M.", "Tom R.", "Sarah M.", "Tom R."],
+        "Time Overdue": ["Overdue (8d)", "Overdue (12d)", "4d", "Overdue (21d)"],
+        "Sentiment": ["Negative", "Very Negative", "Neutral", "Very Negative"]
+    }
+
+    df_esc = pd.DataFrame(data)
+
+    for index, row in df_esc.iterrows():
+        c1, c2, c3, c4, c5, c6, c7, c8, c9 = st.columns([1.2, 2, 2.2, 1, 1, 1.2, 1.5, 1.2, 1])
+        c1.write(f"**{row['Ticket ID']}**")
+        c2.write(row['Customer'])
+        c3.write(row['Issue'])
+        
+        if row['Priority'] == 'Critical':
+            c4.markdown(":red[**Critical**]")
+        elif row['Priority'] == 'High':
+            c4.markdown(":orange[**High**]")
+        else:
+            c4.markdown(":blue[Medium]")
+            
+        c5.write(row['Status'])
+        c6.write(row['Agent'])
+        
+        if "Overdue" in row['Time Overdue']:
+            c7.markdown(f":red[{row['Time Overdue']}]")
+        else:
+            c7.write(row['Time Overdue'])
+            
+        c8.write(row['Sentiment'])
+        
+        with c9:
+            if st.button("Assign", key=f"btn_{row['Ticket ID']}"):
+                st.toast(f"Assigned {row['Ticket ID']}")
+        st.markdown("<hr style='margin: 4px 0px; opacity: 0.2;'>", unsafe_allow_html=True)
+
+# ==========================================
+# PAGE: CUSTOMER TIMELINE
+# ==========================================
+elif selected == "Customer Timeline":
+    col_title, col_search = st.columns([3, 1])
+    with col_title:
+        st.markdown("## Customer Timeline")
+        st.caption("Complete interaction history and event log")
+    with col_search:
+        st.selectbox("Select Customer", ["Acme Corporation", "DataStream Analytics", "LegalEagle Firm"], label_visibility="collapsed")
+
+    st.markdown("---")
+
+    left_col, right_col = st.columns([1, 2.2])
+
+    with left_col:
+        with st.container(border=True):
+            st.markdown("### 🔴 Acme Corporation")
+            st.caption("Critical Status Account")
+            st.markdown("---")
+            
+            col_a, col_b = st.columns(2)
+            col_a.write("Joined")
+            col_b.write("Jun 12, 2023")
+            
+            col_a, col_b = st.columns(2)
+            col_a.write("Subscription")
+            col_b.write("Enterprise")
+            
+            col_a, col_b = st.columns(2)
+            col_a.write("Account Age")
+            col_b.write("18 months")
+            
+            col_a, col_b = st.columns(2)
+            col_a.write("Total Tickets")
+            col_b.write("14")
+            
+            col_a, col_b = st.columns(2)
+            col_a.write("Escalations")
+            col_b.write("3")
+
+        with st.container(border=True):
+            st.markdown("##### EVENT TYPES")
+            st.markdown("🔵 Onboarding &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; **1**")
+            st.markdown("🔘 Support Ticket &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; **6**")
+            st.markdown("🟠 Complaint &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; **3**")
+            st.markdown("🔴 Escalation &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; **2**")
+            st.markdown("🟢 Retention Action &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; **2**")
+            st.markdown("🟣 AI Alert &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; **1**")
+
+    with right_col:
+        st.markdown("### Interaction Timeline")
+        
+        timeline_events = [
+            ("Jun 12, 2023", "Customer Onboarded", "Enterprise plan activated. Onboarding call completed successfully.", "blue"),
+            ("Jul 28, 2023", "First Support Ticket", "Minor API configuration issue. Resolved in 2 days by technical team.", "gray"),
+            ("Sep 15, 2023", "Repeated Complaint", "Billing discrepancy reported for the second time this quarter.", "orange"),
+            ("Oct 22, 2023", "Escalation Event", "Billing dispute escalated to senior account manager after 14 days.", "red"),
+            ("Nov 3, 2023", "Retention Call Held", "30-minute call. Customer expressed frustration about resolution speed.", "purple"),
+            ("Nov 18, 2023", "AI Warning Issued", "Churn probability exceeded 70% threshold. Automated alert sent to team.", "orange")
+        ]
+
+        for date, title, desc, color in timeline_events:
+            with st.container(border=True):
+                col_date, col_content = st.columns([1, 4])
+                col_date.markdown(f"**{date}**")
+                col_content.markdown(f"**{title}**")
+                col_content.caption(desc)
 
 # ==========================================
 # OTHER PAGES PLACEHOLDER
