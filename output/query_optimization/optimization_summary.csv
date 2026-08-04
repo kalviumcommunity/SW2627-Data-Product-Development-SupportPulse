@@ -1,0 +1,4 @@
+Optimization,Benefit,Status
+Remove SELECT *,Reduced unnecessary columns,Completed
+Filter Before JOIN,Reduced rows before JOIN,Completed
+Replace Nested Query with CTE,Improved readability and maintenance,Completed
