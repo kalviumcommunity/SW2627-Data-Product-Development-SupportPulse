@@ -1,0 +1,4 @@
+Metric,Original,Optimized
+Columns Selected,13,7.0
+Rows Returned,10,10.0
+Column Reduction (%),0,46.15

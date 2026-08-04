@@ -189,14 +189,14 @@ AI Retention Platform
 col1, col2, col3 = st.columns([6, 1, 1])
 
 with col1:
-    st.text_input("", placeholder="🔍 Search customers, tickets...", label_visibility="collapsed")
+    st.text_input("", placeholder="🔍 Search customers, tickets...", label_visibility="collapsed", key="global_search_input")
 
 with col2:
-    if st.button("🔄 Refresh"):
+    if st.button("🔄 Refresh", key="global_refresh_btn"):
         st.rerun()
 
 with col3:
-    if st.button("⬇ Export"):
+    if st.button("⬇ Export", key="global_export_btn"):
         st.toast("Exporting data...")
 
 # ==========================================
@@ -204,7 +204,10 @@ with col3:
 # ==========================================
 if selected == "Dashboard":
 
-    st.markdown(...)
+    st.markdown("""
+    <h1 style="color:#000000; font-size:40px; margin-bottom:0px; font-weight:700;">Dashboard</h1>
+    <p style="color:#6B7280; font-size:16px; margin-top:0px;">Overview of churn risk and support health</p>
+    """, unsafe_allow_html=True)
 
     cards = st.columns(5)
 
@@ -305,7 +308,7 @@ elif selected == "Customers":
 
     f1, f2, f3, f4 = st.columns([4, 1, 1, 1])
     with f1:
-        st.text_input("Search filter", placeholder="🔍 Search by name or contact...", label_visibility="collapsed")
+        st.text_input("Search filter", placeholder="🔍 Search by name or contact...", label_visibility="collapsed", key="customers_search")
     with f2:
         st.selectbox("Industry", ["All Industries"], label_visibility="collapsed")
     with f3:
@@ -381,7 +384,7 @@ elif selected == "Support Tickets":
 
     s1, s2 = st.columns([5, 1])
     with s1:
-        st.text_input("Ticket search", placeholder="🔍 Search by ticket ID, customer, or issue...", label_visibility="collapsed")
+        st.text_input("Ticket search", placeholder="🔍 Search by ticket ID, customer, or issue...", label_visibility="collapsed", key="tickets_search")
     with s2:
         st.selectbox("Status", ["All Status"], label_visibility="collapsed")
 
@@ -444,9 +447,9 @@ elif selected == "AI Churn Prediction":
     with col_btns:
         b1, b2 = st.columns(2)
         with b1:
-            st.button("🔄 Retrain Model", use_container_width=True)
+            st.button("🔄 Retrain Model", key="retrain_model_btn", use_container_width=True)
         with b2:
-            st.button("⚡ Run Batch", type="primary", use_container_width=True)
+            st.button("⚡ Run Batch", key="run_batch_btn", type="primary", use_container_width=True)
 
     st.markdown("---")
 
@@ -481,7 +484,7 @@ elif selected == "AI Churn Prediction":
             st.markdown(f'''
                 <div style="background-color: {bg_col}; padding: 12px; border-radius: 10px; margin-bottom: 8px; border: 1px solid #ededed; display: flex; justify-content: space-between; align-items: center;">
                     <div><b>{c['name']}</b><br><span style="font-size: 11px; color: #6b7280;">{c['ind']}</span></div>
-                    <div style="font-weight: bold; color: {risk_col};">{"High" if c["churn_status"]==1 else "Low"}%</div>
+                    <div style="font-weight: bold; color: {risk_col};">{c['risk']}%</div>
                 </div>
             ''', unsafe_allow_html=True)
 
@@ -579,13 +582,13 @@ elif selected == "Escalations":
         st.markdown("## Escalations")
         st.caption("4 active escalations requiring attention")
     with col_search:
-        st.text_input("Search esc", placeholder="🔍 Search customers, tickets...", label_visibility="collapsed")
+        st.text_input("Search esc", placeholder="🔍 Search customers, tickets...", label_visibility="collapsed", key="escalations_search")
     with col_actions:
         cols_btn = st.columns(2)
         with cols_btn[0]:
             st.markdown("🔔")
         with cols_btn[1]:
-            st.button("📥 Export", use_container_width=True)
+            st.button("📥 Export", key="escalations_export_btn", use_container_width=True)
 
     st.markdown("---")
 
@@ -662,24 +665,24 @@ elif selected == "Customer Timeline":
             st.markdown("---")
             
             col_a, col_b = st.columns(2)
-            col_a.write("Joined")
-            col_b.write("Jun 12, 2023")
+            col_a.markdown("**Joined**")
+            col_b.markdown("Jun 12, 2023")
             
             col_a, col_b = st.columns(2)
-            col_a.write("Subscription")
-            col_b.write("Enterprise")
+            col_a.markdown("**Subscription**")
+            col_b.markdown("Enterprise")
             
             col_a, col_b = st.columns(2)
-            col_a.write("Account Age")
-            col_b.write("18 months")
+            col_a.markdown("**Account Age**")
+            col_b.markdown("18 months")
             
             col_a, col_b = st.columns(2)
-            col_a.write("Total Tickets")
-            col_b.write("14")
+            col_a.markdown("**Total Tickets**")
+            col_b.markdown("14")
             
             col_a, col_b = st.columns(2)
-            col_a.write("Escalations")
-            col_b.write("3")
+            col_a.markdown("**Escalations**")
+            col_b.markdown("3")
 
         with st.container(border=True):
             st.markdown("##### EVENT TYPES")
@@ -708,6 +711,187 @@ elif selected == "Customer Timeline":
                 col_date.markdown(f"**{date}**")
                 col_content.markdown(f"**{title}**")
                 col_content.caption(desc)
+
+# ==========================================
+# PAGE: RECOMMENDATIONS
+# ==========================================
+elif selected == "Recommendations":
+    col_title, col_search, col_actions = st.columns([2, 2, 1])
+    with col_title:
+        st.markdown("## AI Recommendations")
+        st.caption("Prioritized retention actions generated by AI — updated Dec 14, 2023")
+    with col_search:
+        st.text_input("", placeholder="🔍 Search customers, tickets...", label_visibility="collapsed", key="recommendations_search")
+    with col_actions:
+        cols_btn = st.columns(2)
+        with cols_btn[0]:
+            st.button("🔄 Refresh", key="rec_refresh_btn")
+        with cols_btn[1]:
+            st.button("📥 Export Plan", key="rec_export_btn", use_container_width=True)
+
+    st.markdown("---")
+
+    m1, m2, m3 = st.columns(3)
+    with m1:
+        st.metric(label="Customers Requiring Action", value="3", delta="High + Critical risk", delta_color="inverse")
+    with m2:
+        st.metric(label="Est. Churn Reduction", value="-34%", delta="With full plan execution", delta_color="normal")
+    with m3:
+        st.metric(label="Revenue Protected", value="$284K", delta="At-risk MRR this quarter", delta_color="normal")
+
+    st.markdown("<br>", unsafe_allow_html=True)
+
+    with st.container(border=True):
+        c_head1, c_head2 = st.columns([4, 1])
+        with c_head1:
+            st.markdown("### 🔴 DataStream Analytics")
+            st.caption("Critical • Analytics • MRR $2,000")
+        with c_head2:
+            st.markdown("<div style='text-align: right; color: #EF4444; font-weight: bold;'>Churn Risk<br><span style='font-size: 24px;'>91%</span></div>", unsafe_allow_html=True)
+        
+        st.info("⚠️ 4 escalations in 30 days. Onboarding issues unresolved for 3 weeks. Extremely high churn probability.")
+        
+        b1, b2, b3, b4 = st.columns(4)
+        with b1: st.button("👤 Assign Agent", key="btn_rec_1")
+        with b2: st.button("🏷️ Send Offer", key="btn_rec_2")
+        with b3: st.button("📅 Schedule Meeting", key="btn_rec_3")
+        with b4: st.button("✉️ Generate Email", key="btn_rec_4")
+        
+        st.markdown("---")
+        f_col1, f_col2 = st.columns([2, 2])
+        f_col1.caption("Est. revenue at risk: **$24,000/yr**")
+        f_col2.markdown("<div style='text-align: right; color: #10B981; font-size: 13px;'>Estimated churn reduction if acted: <b>-28%</b></div>", unsafe_allow_html=True)
+
+    with st.container(border=True):
+        c_head1, c_head2 = st.columns([4, 1])
+        with c_head1:
+            st.markdown("### 🔴 Acme Corporation")
+            st.caption("Critical • Manufacturing • MRR $4,000")
+        with c_head2:
+            st.markdown("<div style='text-align: right; color: #EF4444; font-weight: bold;'>Churn Risk<br><span style='font-size: 24px;'>87%</span></div>", unsafe_allow_html=True)
+        
+        st.info("⚠️ High escalation rate with repeated billing complaints. 3 unresolved tickets in the past 30 days indicate serious dissatisfaction.")
+        
+        b1, b2, b3, b4 = st.columns(4)
+        with b1: st.button("👤 Assign Agent", key="btn_rec_5")
+        with b2: st.button("🏷️ Send Offer", key="btn_rec_6")
+        with b3: st.button("📅 Schedule Meeting", key="btn_rec_7")
+        with b4: st.button("✉️ Generate Email", key="btn_rec_8")
+        
+        st.markdown("---")
+        f_col1, f_col2 = st.columns([2, 2])
+        f_col1.caption("Est. revenue at risk: **$48,000/yr**")
+        f_col2.markdown("<div style='text-align: right; color: #10B981; font-size: 13px;'>Estimated churn reduction if acted: <b>-28%</b></div>", unsafe_allow_html=True)
+
+# ==========================================
+# PAGE: REPORTS
+# ==========================================
+elif selected == "Reports":
+    col_title, col_actions = st.columns([3, 1])
+    with col_title:
+        st.markdown("## Reports")
+        st.caption("Analytics reports and data exports")
+    with col_actions:
+        cols_btn = st.columns(2)
+        with cols_btn[0]:
+            st.button("📥 Download PDF", key="reports_pdf_btn")
+        with cols_btn[1]:
+            st.button("📊 Export Excel", key="reports_excel_btn", type="primary")
+
+    st.markdown("---")
+
+    tab1, tab2, tab3, tab4 = st.tabs(["Weekly Report", "Monthly Report", "Department Report", "Churn Forecast"])
+
+    with tab1:
+        st.write("")
+        c_chart1, c_chart2 = st.columns(2)
+        
+        with c_chart1:
+            with st.container(border=True):
+                st.markdown("##### Churn Trend — This Week")
+                st.caption("Actual vs predicted churn rate")
+                trend_df = pd.DataFrame({"Month": ["Jul", "Aug", "Sep", "Oct", "Nov", "Dec"], "Actual": [2, 2.2, 3, 2.8, 3.8, 4.4]})
+                fig = px.line(trend_df, x="Month", y="Actual", markers=True)
+                fig.update_layout(height=260, margin=dict(l=10, r=10, t=10, b=10), plot_bgcolor="white", paper_bgcolor="white")
+                st.plotly_chart(fig, use_container_width=True)
+                
+        with c_chart2:
+            with st.container(border=True):
+                st.markdown("##### Risk Distribution")
+                st.caption("Customer count by risk level")
+                risk_df = pd.DataFrame({"Risk Level": ["Healthy", "Low Risk", "Medium", "High Risk", "Critical"], "Count": [330, 470, 280, 110, 30]})
+                fig2 = px.bar(risk_df, x="Risk Level", y="Count", color="Risk Level", color_discrete_map={"Healthy": "#10B981", "Low Risk": "#3B82F6", "Medium": "#F59E0B", "High Risk": "#F97316", "Critical": "#EF4444"})
+                fig2.update_layout(height=260, margin=dict(l=10, r=10, t=10, b=10), plot_bgcolor="white", paper_bgcolor="white", showlegend=False)
+                st.plotly_chart(fig2, use_container_width=True)
+
+        c_chart3, c_chart4 = st.columns(2)
+        with c_chart3:
+            with st.container(border=True):
+                st.markdown("##### Resolution Performance")
+                st.caption("Avg resolution time by category (days)")
+                st.write("Billing (Target: 2d): **4.2d**")
+                st.progress(80)
+                st.write("Technical (Target: 1.5d): **3.1d**")
+                st.progress(65)
+                st.write("Onboarding (Target: 3d): **6.8d**")
+                st.progress(95)
+                st.write("Product (Target: 2d): **2.4d**")
+                st.progress(50)
+
+        with c_chart4:
+            with st.container(border=True):
+                st.markdown("##### Complaint Distribution")
+                st.caption("By category — this quarter")
+                pie_data = pd.DataFrame({"Category": ["Billing", "Performance", "Integration", "Onboarding", "Other"], "Value": [28, 22, 19, 10, 5]})
+                fig3 = px.pie(pie_data, names="Category", values="Value", hole=0.6)
+                fig3.update_layout(height=260, margin=dict(l=10, r=10, t=10, b=10), paper_bgcolor="white")
+                st.plotly_chart(fig3, use_container_width=True)
+
+# ==========================================
+# PAGE: SETTINGS
+# ==========================================
+elif selected == "Settings":
+    st.markdown("## Settings")
+    st.markdown("---")
+
+    nav_col, form_col = st.columns([1, 3])
+
+    with nav_col:
+        st.markdown("👤 **Profile**")
+        st.markdown("👥 Users & Roles")
+        st.markdown("⚙️ AI Thresholds")
+        st.markdown("🔔 Notifications")
+        st.markdown("🔒 Security")
+        st.markdown("🔑 API Keys")
+
+    with form_col:
+        with st.container(border=True):
+            st.markdown("### Profile Information")
+            
+            col_avatar, col_info = st.columns([1, 6])
+            with col_avatar:
+                st.markdown("### 🔵 **AM**")
+            with col_info:
+                st.markdown("**Alex Morgan**")
+                st.caption("Support Manager • alex@company.com")
+                
+            st.markdown("<br>", unsafe_allow_html=True)
+            
+            f1, f2 = st.columns(2)
+            with f1:
+                st.text_input("First Name", value="Alex", key="settings_first_name")
+            with f2:
+                st.text_input("Last Name", value="Morgan", key="settings_last_name")
+                
+            f3, f4 = st.columns(2)
+            with f3:
+                st.text_input("Email", value="alex@company.com", key="settings_email")
+            with f4:
+                st.text_input("Role", value="Support Manager", key="settings_role")
+                
+            st.markdown("<br>", unsafe_allow_html=True)
+            if st.button("Save Changes", key="settings_save_btn", type="primary"):
+                st.success("Profile information updated successfully!")
 
 # ==========================================
 # OTHER PAGES PLACEHOLDER
