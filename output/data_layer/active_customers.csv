@@ -1,0 +1,10 @@
+customer_id,transaction_count,total_spent,last_transaction,name,email,phone,signup_date,plan_type,region,tenure_days,monthly_spend,churn_status,churn_date
+101,2,650,2025-01-18 09:20:10,Samuel Lopez,samuel.lopez@example.com,2120800614,2024-10-04,Pro,EMEA,661,104.57,1,2025-02-08
+102,1,300,2025-01-20 16:45:30,Oliver Robinson,oliver.robinson@example.com,6177262552,2026-04-30,Pro,North America,88,114.57,0,
+103,1,450,2025-02-02 11:15:00,Mia Sanchez,mia.sanchez@example.com,2122793036,2024-07-01,Premium,Asia Pacific,756,213.34,0,
+104,1,500,2025-02-10 20:30:40,Carter Harris,carter.harris@example.com,9153580460,2026-02-20,Pro,North America,157,93.14,1,2026-07-24
+105,1,200,2025-02-18 08:10:00,Aria Robinson,aria.robinson@example.com,4153519490,2024-06-22,Pro,Latin America,765,126.71,0,
+106,1,350,2025-03-01 13:25:55,Grace Smith,grace.smith@example.com,4155373774,2024-07-07,Pro,EMEA,750,143.21,0,
+107,1,600,2025-03-10 18:00:00,Avery Robinson,avery.robinson@example.com,3103122339,2026-03-05,Pro,Europe,144,109.63,1,2026-07-14
+108,1,700,2025-03-15 10:40:35,Wyatt Gonzalez,wyatt.gonzalez@example.com,9154397557,2025-12-01,Premium,Latin America,238,284.91,0,
+109,1,550,2025-03-28 21:50:15,Luna Williams,luna.williams@example.com,2129971807,2025-01-18,Pro,North America,555,86.96,0,
