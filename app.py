@@ -200,13 +200,16 @@ with col3:
         st.toast("Exporting data...")
 
 # ==========================================
+# ==========================================
 # PAGE: DASHBOARD
 # ==========================================
 if selected == "Dashboard":
 
     st.markdown("""
     <h1 style="color:#000000; font-size:40px; margin-bottom:0px; font-weight:700;">Dashboard</h1>
-    <p style="color:#6B7280; font-size:16px; margin-top:0px;">Overview of churn risk and support health</p>
+    <p style="color:#6B7280; font-size:16px; margin-top:0px;">
+        Overview of churn risk and support health
+    </p>
     """, unsafe_allow_html=True)
 
     cards = st.columns(5)
@@ -222,55 +225,112 @@ if selected == "Dashboard":
     ]
 
     for col, (icon, val, title, change, color) in zip(cards, values):
+
         with col:
-            cls = "metric-change-red" if color == "red" else "metric-change-green"
+
+            cls = (
+                "metric-change-red"
+                if color == "red"
+                else "metric-change-green"
+            )
+
             st.markdown(f"""
             <div class="metric-card">
-            <span>{icon}</span>
-            <span class="{cls}">{change}</span>
-            <div class="metric-value">{val}</div>
-            <div class="metric-title">{title}</div>
+                <span>{icon}</span>
+                <span class="{cls}">{change}</span>
+                <div class="metric-value">{val}</div>
+                <div class="metric-title">{title}</div>
             </div>
             """, unsafe_allow_html=True)
 
     st.write("")
 
-    left, right = st.columns([2.2, 1])
-
-    customers["signup_date"] = pd.to_datetime(customers["signup_date"])
+    customers["signup_date"] = pd.to_datetime(
+        customers["signup_date"]
+    )
 
     trend = (
-        customers.groupby(customers["signup_date"].dt.to_period("M"))
+        customers.groupby(
+            customers["signup_date"].dt.to_period("M")
+        )
         .size()
         .reset_index(name="Customers")
     )
 
     trend["signup_date"] = trend["signup_date"].astype(str)
 
+    left, right = st.columns(2)
+
+    # -----------------------------
+    # Monthly Trend
+    # -----------------------------
     with left:
+
         st.markdown("### Monthly Customer Trend")
 
         fig = px.line(
             trend,
             x="signup_date",
             y="Customers",
-            markers=True
+            markers=True,
+            title="Monthly Customer Trend"
+        )
+
+        fig.update_traces(
+            hovertemplate=
+            "<b>Month:</b> %{x}<br>"
+            "<b>Customers:</b> %{y}<extra></extra>",
+            line=dict(
+                width=4,
+                color="#2563EB"
+            )
+        )
+
+        fig.update_xaxes(
+            rangeslider_visible=True,
+            rangeselector=dict(
+                buttons=[
+                    dict(
+                        count=3,
+                        label="3M",
+                        step="month",
+                        stepmode="backward"
+                    ),
+                    dict(
+                        count=6,
+                        label="6M",
+                        step="month",
+                        stepmode="backward"
+                    ),
+                    dict(step="all")
+                ]
+            )
         )
 
         fig.update_layout(
             height=420,
             plot_bgcolor="white",
             paper_bgcolor="white",
-            margin=dict(l=10, r=10, t=10, b=10),
-            xaxis_title="",
-            yaxis_title=""
+            hovermode="x unified",
+            dragmode="zoom",
+            margin=dict(
+                l=10,
+                r=10,
+                t=40,
+                b=10
+            )
         )
 
-        fig.update_traces(line=dict(width=4, color="#2563EB"))
+        st.plotly_chart(
+            fig,
+            use_container_width=True
+        )
 
-        st.plotly_chart(fig, use_container_width=True)
-
+    # -----------------------------
+    # Complaint Categories
+    # -----------------------------
     with right:
+
         st.markdown("### Complaint Categories")
 
         pie = (
@@ -279,24 +339,42 @@ if selected == "Dashboard":
             .reset_index()
         )
 
-        pie.columns = ["Category", "Value"]
+        pie.columns = [
+            "Category",
+            "Value"
+        ]
 
         fig2 = px.pie(
             pie,
             names="Category",
             values="Value",
-            hole=0.72
+            hole=0.72,
+            color_discrete_sequence=px.colors.qualitative.Set2
+        )
+
+        fig2.update_traces(
+            hovertemplate=
+            "<b>%{label}</b><br>"
+            "Tickets: %{value}<br>"
+            "Percentage: %{percent}<extra></extra>"
         )
 
         fig2.update_layout(
             height=420,
             paper_bgcolor="white",
-            margin=dict(l=0, r=0, t=10, b=0),
+            margin=dict(
+                l=0,
+                r=0,
+                t=10,
+                b=0
+            ),
             showlegend=True
         )
 
-        st.plotly_chart(fig2, use_container_width=True)
-
+        st.plotly_chart(
+            fig2,
+            use_container_width=True
+        )
 # ==========================================
 # PAGE: CUSTOMERS
 # ==========================================
