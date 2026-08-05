@@ -1,0 +1,4 @@
+Metric,SQL,Python,Difference,Percent_Difference,Status,Investigation,Timestamp
+Active Customers,120.0,120.0,0.0,0.0,PASS,Metrics Match,2026-08-05 13:48:29.548912
+Average Order Value,430.0,438.6,8.600000000000023,2.0000000000000053,FAIL,Manual Review Required,2026-08-05 13:48:29.548912
+Total Revenue,4300.0,4550.0,250.0,5.813953488372093,FAIL,Manual Review Required,2026-08-05 13:48:29.548912
