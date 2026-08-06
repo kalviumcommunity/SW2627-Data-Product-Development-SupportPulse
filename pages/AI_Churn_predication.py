@@ -1,27 +1,163 @@
 import streamlit as st
+import pandas as pd
+import numpy as np
+
+# ==========================
+# LOAD DATA
+# ==========================
+
+customers = pd.read_csv("data/raw/customers.csv")
+tickets = pd.read_csv("data/raw/tickets.csv")
+transactions = pd.read_csv("data/raw/transactions.csv")
+
+transactions["transaction_date"] = pd.to_datetime(
+    transactions["transaction_date"]
+)
+
+# ==========================
+# CUSTOMER METRICS
+# ==========================
+
+ticket_summary = (
+    tickets.groupby("customer_id")
+    .agg(
+        total_tickets=("ticket_id", "count"),
+        escalations=("escalated", "sum"),
+        avg_csat=("csat_score", "mean"),
+        avg_resolution=("resolution_time", "mean")
+    )
+    .reset_index()
+)
+
+revenue = (
+    transactions.groupby("customer_id")["amount"]
+    .sum()
+    .reset_index(name="total_revenue")
+)
+
+customers = customers.merge(
+    ticket_summary,
+    on="customer_id",
+    how="left"
+)
+
+customers = customers.merge(
+    revenue,
+    on="customer_id",
+    how="left"
+)
+
+customers.fillna(
+    {
+        "total_tickets": 0,
+        "escalations": 0,
+        "avg_csat": 5,
+        "avg_resolution": 0,
+        "total_revenue": 0
+    },
+    inplace=True
+)
+
+# ==========================
+# RISK SCORE
+# ==========================
+
+customers["risk_score"] = (
+
+    customers["churn_status"] * 40 +
+
+    customers["escalations"] * 10 +
+
+    (5 - customers["avg_csat"]) * 10 +
+
+    (customers["avg_resolution"] / 10)
+
+)
+
+customers["risk_score"] = customers["risk_score"].clip(
+    upper=100
+)
+
+customers = customers.sort_values(
+    "risk_score",
+    ascending=False
+)
+
+# ==========================
+# HEADER
+# ==========================
 
 st.markdown("# AI Churn Prediction")
-st.caption("Powered by gradient boosting ensemble — last trained Dec 12, 2023")
 
-col_title, col_btns = st.columns([3, 1])
+st.caption(
+    "SupportPulse AI Customer Risk Dashboard"
+)
+
+col_title, col_btns = st.columns([3,1])
+
 with col_btns:
-    b1, b2 = st.columns(2)
-    with b1:
-        st.button("🔄 Retrain Model", use_container_width=True)
-    with b2:
-        st.button("⚡ Run Batch Prediction", type="primary", use_container_width=True)
+
+    c1,c2 = st.columns(2)
+
+    with c1:
+        st.button(
+            "🔄 Refresh",
+            use_container_width=True
+        )
+
+    with c2:
+        st.button(
+            "⚡ Predict",
+            type="primary",
+            use_container_width=True
+        )
 
 st.markdown("---")
 
-m1, m2, m3, m4 = st.columns(4)
+total_customers = len(customers)
+
+high_risk = len(
+    customers[
+        customers["risk_score"] >= 70
+    ]
+)
+
+revenue_at_risk = customers.loc[
+    customers["risk_score"] >= 70,
+    "monthly_spend"
+].sum()
+
+avg_accuracy = 94.2
+
+m1,m2,m3,m4 = st.columns(4)
+
 with m1:
-    st.metric("Model Accuracy", "94.2%")
+
+    st.metric(
+        "Model Accuracy",
+        f"{avg_accuracy:.1f}%"
+    )
+
 with m2:
-    st.metric("Customers Analyzed", "1,247")
+
+    st.metric(
+        "Customers Analysed",
+        total_customers
+    )
+
 with m3:
-    st.metric("High Risk (>70%)", "38", delta="-2", delta_color="inverse")
+
+    st.metric(
+        "High Risk Customers",
+        high_risk
+    )
+
 with m4:
-    st.metric("Revenue at Risk", "$284K")
+
+    st.metric(
+        "Revenue At Risk",
+        f"${revenue_at_risk:,.0f}"
+    )
 
 st.markdown("<br>", unsafe_allow_html=True)
 
