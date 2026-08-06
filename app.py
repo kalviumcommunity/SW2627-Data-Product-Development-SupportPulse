@@ -5,6 +5,11 @@ from streamlit_option_menu import option_menu
 
 import os
 
+from utils.kpi_utils import (
+    calculate_kpis,
+    get_trend_indicator
+)
+
 metrics = pd.read_csv("output/dashboard_metrics.csv")
 
 customers = pd.read_csv(
@@ -13,6 +18,16 @@ customers = pd.read_csv(
 
 tickets = pd.read_csv(
     "data/processed/feature_engineered_tickets.csv"
+)
+
+transactions = pd.read_csv(
+    "data/raw/transactions.csv"
+)
+
+kpis = calculate_kpis(
+    customers,
+    tickets,
+    transactions
 )
 
 st.set_page_config(
@@ -200,7 +215,6 @@ with col3:
         st.toast("Exporting data...")
 
 # ==========================================
-# ==========================================
 # PAGE: DASHBOARD
 # ==========================================
 if selected == "Dashboard":
@@ -212,19 +226,67 @@ if selected == "Dashboard":
     </p>
     """, unsafe_allow_html=True)
 
-    cards = st.columns(5)
+    ccards = st.columns(5)
 
-    metric_dict = dict(zip(metrics["Metric"], metrics["Value"]))
+    kpis = calculate_kpis(
+        customers,
+        tickets,
+        transactions
+    )
 
-    values = [
-        ("👥", int(metric_dict["Total Customers"]), "Total Customers", "", "green"),
-        ("🎫", int(metric_dict["Total Tickets"]), "Total Tickets", "", "green"),
-        ("⚠", f'{metric_dict["Churn Rate (%)"]}%', "Churn Rate", "", "red"),
-        ("✅", f'{metric_dict["Resolution Rate (%)"]}%', "Resolution Rate", "", "green"),
-        ("🕒", f'{metric_dict["Average Resolution Time"]} hrs', "Avg Resolution", "", "red")
-    ]
+    values = []
 
-    for col, (icon, val, title, change, color) in zip(cards, values):
+    icons = {
+        "Revenue": "💰",
+        "Active Customers": "👥",
+        "Average Order Value": "🛒",
+        "Churn Rate": "⚠",
+        "Customer Satisfaction": "⭐"
+    }
+
+    for metric in [
+        "Revenue",
+        "Active Customers",
+        "Average Order Value",
+        "Churn Rate",
+        "Customer Satisfaction"
+    ]:
+
+        current, change = kpis[metric]
+
+        inverse = metric == "Churn Rate"
+
+        arrow, color = get_trend_indicator(
+            change,
+            inverse=inverse
+        )
+
+        if metric == "Revenue":
+            value = f"${current:,.0f}"
+
+        elif metric == "Average Order Value":
+            value = f"${current:.2f}"
+
+        elif metric == "Churn Rate":
+            value = f"{current:.1f}%"
+
+        elif metric == "Customer Satisfaction":
+            value = f"{current:.2f}/5"
+
+        else:
+            value = f"{int(current)}"
+
+        values.append(
+            (
+                icons[metric],
+                value,
+                metric,
+                f"{arrow} {change:.1f}%",
+                color
+            )
+        )
+
+    for col, (icon, val, title, change, color) in zip(ccards, values):
 
         with col:
 
@@ -234,14 +296,17 @@ if selected == "Dashboard":
                 else "metric-change-green"
             )
 
-            st.markdown(f"""
-            <div class="metric-card">
-                <span>{icon}</span>
-                <span class="{cls}">{change}</span>
-                <div class="metric-value">{val}</div>
-                <div class="metric-title">{title}</div>
-            </div>
-            """, unsafe_allow_html=True)
+            st.markdown(
+                f"""
+                <div class="metric-card">
+                    <span>{icon}</span>
+                    <span class="{cls}">{change}</span>
+                    <div class="metric-value">{val}</div>
+                    <div class="metric-title">{title}</div>
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
 
     st.write("")
 
@@ -303,9 +368,9 @@ if selected == "Dashboard":
                         stepmode="backward"
                     ),
                     dict(step="all")
-                ]
+                    ]
+                )
             )
-        )
 
         fig.update_layout(
             height=420,
