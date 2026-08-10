@@ -67,10 +67,3 @@ The recommendations include:
 
 The final narrative connects the analysis findings to practical business actions while keeping the explanation understandable for a non-technical audience.  
 
-## Review Status
-
-Peer/mentor feedback has not yet been collected.
-
-## Self-Review
-
-The narrative was reviewed for clarity, business relevance, evidence, and actionability.
