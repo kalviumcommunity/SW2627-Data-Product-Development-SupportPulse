@@ -48,9 +48,33 @@ st.markdown("""
 # ---------------- CSS Styles ----------------
 st.markdown("""
 <style>
+
+    /* Fix text inside dark chart/element containers */
+    .stPlotlyChart text {
+        fill: #000000 !important;
+        color: #000000 !important;
+    }
+
+    /* Streamlit dataframe/table text */
+    [data-testid="stDataFrame"] * {
+        color: #000000 !important;
+    }
+
+    /* General text inside app elements */
+    [data-testid="stVerticalBlock"] p,
+    [data-testid="stVerticalBlock"] span,
+    [data-testid="stVerticalBlock"] label {
+        color: #000000 !important;
+    }
+
+</style>
+""", unsafe_allow_html=True)
+st.markdown("""
+<style>
 #MainMenu {visibility:hidden;}
 footer {visibility:hidden;}
 header {visibility:hidden;}
+
 
 .stApp{
     background:#f7f8fc;
@@ -156,7 +180,8 @@ AI Retention Platform
             "Customer Timeline",
             "Recommendations",
             "Reports",
-            "Settings"
+            "Settings",
+            "Dataset Upload",
         ],
         icons=[
             "grid",
@@ -1049,13 +1074,350 @@ elif selected == "Settings":
                 st.success("Profile information updated successfully!")
 
 # ==========================================
+# PAGE: DATASET UPLOAD
+# ==========================================
+
+elif selected == "Dataset Upload":
+
+    st.markdown("""
+        <h1 style="color:#000000; font-size:40px; margin-bottom:0px; font-weight:700;">
+            Dataset Upload
+        </h1>
+        <p style="color:#6B7280; font-size:16px; margin-top:0px;">
+            Upload and explore CSV or JSON datasets
+        </p>
+    """, unsafe_allow_html=True)
+
+    st.divider()
+
+    # ==========================================
+    # TASK 1: FILE UPLOAD
+    # ==========================================
+
+    st.header("Upload Dataset")
+
+    uploaded_file = st.file_uploader(
+        "Choose a CSV or JSON file",
+        type=["csv", "json"],
+        help="Supported formats: CSV and JSON"
+    )
+
+    # ==========================================
+    # NO FILE UPLOADED
+    # ==========================================
+
+    if uploaded_file is None:
+
+        st.info(
+            "Upload a CSV or JSON file to begin."
+        )
+
+    else:
+
+        # ==========================================
+        # READ UPLOADED FILE
+        # ==========================================
+
+        try:
+
+            uploaded_file.seek(0)
+
+            if uploaded_file.name.lower().endswith(".csv"):
+
+                df = pd.read_csv(
+                    uploaded_file
+                )
+
+            elif uploaded_file.name.lower().endswith(".json"):
+
+                df = pd.read_json(
+                    uploaded_file
+                )
+
+            else:
+
+                st.error(
+                    "Unsupported file type. "
+                    "Please upload a CSV or JSON file."
+                )
+
+                st.stop()
+
+        # ==========================================
+        # ERROR HANDLING
+        # ==========================================
+
+        except pd.errors.EmptyDataError:
+
+            st.warning(
+                "Uploaded file is empty. "
+                "Please upload a file containing data."
+            )
+
+            st.stop()
+
+        except (
+            ValueError,
+            TypeError
+        ):
+
+            st.error(
+                "Could not read this file. "
+                "Please check that the file is a valid "
+                "CSV or JSON dataset."
+            )
+
+            st.stop()
+
+        except Exception:
+
+            st.error(
+                "Could not read this file. "
+                "Check the format and try again."
+            )
+
+            st.stop()
+
+        # ==========================================
+        # EMPTY DATAFRAME
+        # ==========================================
+
+        if df.empty:
+
+            st.warning(
+                "Uploaded file is empty."
+            )
+
+            st.stop()
+
+        # ==========================================
+        # SUCCESS MESSAGE
+        # ==========================================
+
+        st.success(
+            f"Loaded: {uploaded_file.name} "
+            f"({len(df):,} rows, "
+            f"{len(df.columns):,} columns)"
+        )
+
+        # ==========================================
+        # TASK 2: DATASET OVERVIEW
+        # ==========================================
+
+        st.divider()
+
+        st.header("Dataset Overview")
+
+        col1, col2, col3 = st.columns(3)
+
+        with col1:
+
+            st.metric(
+                "Rows",
+                f"{len(df):,}"
+            )
+
+        with col2:
+
+            st.metric(
+                "Columns",
+                f"{len(df.columns):,}"
+            )
+
+        with col3:
+
+            total_nulls = df.isnull().sum().sum()
+
+            total_cells = (
+                df.shape[0] *
+                df.shape[1]
+            )
+
+            if total_cells > 0:
+
+                null_percentage = (
+                    total_nulls /
+                    total_cells
+                ) * 100
+
+            else:
+
+                null_percentage = 0
+
+            st.metric(
+                "Null %",
+                f"{null_percentage:.1f}%"
+            )
+
+        # ==========================================
+        # FIRST 10 ROWS
+        # ==========================================
+
+        st.subheader("First 10 Rows")
+
+        st.dataframe(
+            df.head(10),
+            use_container_width=True,
+            hide_index=True
+        )
+
+        # ==========================================
+        # COLUMN SUMMARY
+        # ==========================================
+
+        st.subheader("Column Summary")
+
+        column_summary = pd.DataFrame({
+
+            "Column":
+                df.columns,
+
+            "Type":
+                df.dtypes.astype(str).values,
+
+            "Non-Null":
+                df.notnull().sum().values,
+
+            "Null Count":
+                df.isnull().sum().values,
+
+            "Null %":
+                (
+                    df.isnull().sum()
+                    / len(df)
+                    * 100
+                ).round(1).values
+        })
+
+        st.dataframe(
+            column_summary,
+            use_container_width=True,
+            hide_index=True
+        )
+
+        # ==========================================
+        # TASK 3: DESCRIPTIVE STATISTICS
+        # ==========================================
+
+        st.divider()
+
+        st.header("Descriptive Statistics")
+
+        numeric_df = df.select_dtypes(
+            include="number"
+        )
+
+        if numeric_df.empty:
+
+            st.info(
+                "No numeric columns are available "
+                "for descriptive statistics."
+            )
+
+        else:
+
+            st.dataframe(
+                numeric_df.describe(),
+                use_container_width=True
+            )
+
+        # ==========================================
+        # TASK 5: QUICK EXPLORATION
+        # ==========================================
+
+        st.divider()
+
+        st.header("Quick Exploration")
+
+        numeric_cols = (
+            df
+            .select_dtypes(
+                include="number"
+            )
+            .columns
+            .tolist()
+        )
+
+        if numeric_cols:
+
+            selected_column = st.selectbox(
+                "Select a numeric column to visualise",
+                numeric_cols
+            )
+
+            st.subheader(
+                f"Distribution of {selected_column}"
+            )
+
+            chart_data = (
+                df[selected_column]
+                .value_counts()
+                .head(20)
+                .sort_index()
+            )
+
+            st.bar_chart(
+                chart_data
+            )
+
+        else:
+
+            st.info(
+                "No numeric columns are available "
+                "for visualization."
+            )
+
+        # ==========================================
+        # OPTIONAL DATASET DETAILS
+        # ==========================================
+
+        with st.expander(
+            "ℹ️ Dataset Details"
+        ):
+
+            st.write(
+                f"**File:** {uploaded_file.name}"
+            )
+
+            st.write(
+                f"**Rows:** {len(df):,}"
+            )
+
+            st.write(
+                f"**Columns:** {len(df.columns):,}"
+            )
+
+            st.write(
+                f"**Total Cells:** "
+                f"{df.shape[0] * df.shape[1]:,}"
+            )
+
+            st.write(
+                f"**Numeric Columns:** "
+                f"{len(numeric_cols)}"
+            )
+
+
+# ==========================================
 # OTHER PAGES PLACEHOLDER
 # ==========================================
+
 else:
+
     st.markdown(f"""
-    <h1 style="color:#000000; font-size:40px; margin-bottom:0px; font-weight:700;">{selected}</h1>
-    <p style="color:#6B7280; font-size:16px; margin-top:0px;">Manage module settings and controls for {selected.lower()}</p>
+        <h1 style="color:#000000; font-size:40px; margin-bottom:0px; font-weight:700;">
+            {selected}
+        </h1>
+
+        <p style="color:#6B7280; font-size:16px; margin-top:0px;">
+            Manage module settings and controls for {selected.lower()}
+        </p>
     """, unsafe_allow_html=True)
+
     st.write("")
-    st.info(f"The **{selected}** module view is active. Connect your specific backend data models or filters for this section here.")
- 
+
+    st.info(
+        f"The **{selected}** module view is active. "
+        f"Connect your specific backend data models or filters "
+        f"for this section here."
+    )
