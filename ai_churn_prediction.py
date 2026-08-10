@@ -15,6 +15,8 @@ tickets["resolution_time"] = pd.to_numeric(tickets["resolution_time"], errors="c
 tickets["escalated"] = pd.to_numeric(tickets["escalated"], errors="coerce")
 transactions["amount"] = pd.to_numeric(transactions["amount"], errors="coerce")
 
+
+
 ticket_summary = tickets.groupby("customer_id").agg(
     total_tickets=("ticket_id", "count"),
     escalations=("escalated", "sum"),
