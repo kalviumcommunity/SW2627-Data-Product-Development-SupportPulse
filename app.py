@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 from streamlit_option_menu import option_menu
-
+from streamlit_export_integration import render_export_section
 import os
 
 from utils.kpi_utils import (
@@ -440,6 +440,18 @@ if selected == "Dashboard":
             fig2,
             use_container_width=True
         )
+
+            # ==========================================
+    # REPORT EXPORT
+    # ==========================================
+
+    st.markdown("---")
+
+    render_export_section(
+        customers,
+        tickets,
+        transactions
+    )
 # ==========================================
 # PAGE: CUSTOMERS
 # ==========================================
@@ -1046,3 +1058,4 @@ else:
     """, unsafe_allow_html=True)
     st.write("")
     st.info(f"The **{selected}** module view is active. Connect your specific backend data models or filters for this section here.")
+ 
