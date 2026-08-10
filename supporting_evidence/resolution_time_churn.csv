@@ -1,0 +1,5 @@
+resolution_bucket,customers,churn_rate
+<2 hours,9,33.33333333333333
+2-4 hours,2,50.0
+4-24 hours,103,20.388349514563107
+>24 hours,6,33.33333333333333
