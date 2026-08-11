@@ -48,9 +48,33 @@ st.markdown("""
 # ---------------- CSS Styles ----------------
 st.markdown("""
 <style>
+
+    /* Fix text inside dark chart/element containers */
+    .stPlotlyChart text {
+        fill: #000000 !important;
+        color: #000000 !important;
+    }
+
+    /* Streamlit dataframe/table text */
+    [data-testid="stDataFrame"] * {
+        color: #000000 !important;
+    }
+
+    /* General text inside app elements */
+    [data-testid="stVerticalBlock"] p,
+    [data-testid="stVerticalBlock"] span,
+    [data-testid="stVerticalBlock"] label {
+        color: #000000 !important;
+    }
+
+</style>
+""", unsafe_allow_html=True)
+st.markdown("""
+<style>
 #MainMenu {visibility:hidden;}
 footer {visibility:hidden;}
 header {visibility:hidden;}
+
 
 .stApp{
     background:#f7f8fc;
@@ -156,20 +180,24 @@ AI Retention Platform
             "Customer Timeline",
             "Recommendations",
             "Reports",
-            "Settings"
+            "Settings",
+            "Dataset Upload",
+            "Session State",
         ],
         icons=[
-            "grid",
-            "people",
-            "ticket",
-            "robot",
-            "exclamation-triangle",
-            "graph-up",
-            "clock-history",
-            "lightbulb",
-            "file-earmark-text",
-            "gear"
-        ],
+    "grid",
+    "people",
+    "ticket",
+    "robot",
+    "exclamation-triangle",
+    "graph-up",
+    "clock-history",
+    "lightbulb",
+    "file-earmark-text",
+    "gear",
+    "cloud-upload",
+    "arrow-repeat"
+],
         default_index=0,
         styles={
             "container": {
@@ -1049,13 +1077,692 @@ elif selected == "Settings":
                 st.success("Profile information updated successfully!")
 
 # ==========================================
+# PAGE: DATASET UPLOAD
+# ==========================================
+
+elif selected == "Dataset Upload":
+
+    st.markdown("""
+        <h1 style="color:#000000; font-size:40px; margin-bottom:0px; font-weight:700;">
+            Dataset Upload
+        </h1>
+        <p style="color:#6B7280; font-size:16px; margin-top:0px;">
+            Upload and explore CSV or JSON datasets
+        </p>
+    """, unsafe_allow_html=True)
+
+    st.divider()
+
+    # ==========================================
+    # TASK 1: FILE UPLOAD
+    # ==========================================
+
+    st.header("Upload Dataset")
+
+    uploaded_file = st.file_uploader(
+        "Choose a CSV or JSON file",
+        type=["csv", "json"],
+        help="Supported formats: CSV and JSON"
+    )
+
+    # ==========================================
+    # NO FILE UPLOADED
+    # ==========================================
+
+    if uploaded_file is None:
+
+        st.info(
+            "Upload a CSV or JSON file to begin."
+        )
+
+    else:
+
+        # ==========================================
+        # READ UPLOADED FILE
+        # ==========================================
+
+        try:
+
+            uploaded_file.seek(0)
+
+            if uploaded_file.name.lower().endswith(".csv"):
+
+                df = pd.read_csv(
+                    uploaded_file
+                )
+
+            elif uploaded_file.name.lower().endswith(".json"):
+
+                df = pd.read_json(
+                    uploaded_file
+                )
+
+            else:
+
+                st.error(
+                    "Unsupported file type. "
+                    "Please upload a CSV or JSON file."
+                )
+
+                st.stop()
+
+        # ==========================================
+        # ERROR HANDLING
+        # ==========================================
+
+        except pd.errors.EmptyDataError:
+
+            st.warning(
+                "Uploaded file is empty. "
+                "Please upload a file containing data."
+            )
+
+            st.stop()
+
+        except (
+            ValueError,
+            TypeError
+        ):
+
+            st.error(
+                "Could not read this file. "
+                "Please check that the file is a valid "
+                "CSV or JSON dataset."
+            )
+
+            st.stop()
+
+        except Exception:
+
+            st.error(
+                "Could not read this file. "
+                "Check the format and try again."
+            )
+
+            st.stop()
+
+        # ==========================================
+        # EMPTY DATAFRAME
+        # ==========================================
+
+        if df.empty:
+
+            st.warning(
+                "Uploaded file is empty."
+            )
+
+            st.stop()
+
+        # ==========================================
+        # SUCCESS MESSAGE
+        # ==========================================
+
+        st.success(
+            f"Loaded: {uploaded_file.name} "
+            f"({len(df):,} rows, "
+            f"{len(df.columns):,} columns)"
+        )
+
+        # ==========================================
+        # TASK 2: DATASET OVERVIEW
+        # ==========================================
+
+        st.divider()
+
+        st.header("Dataset Overview")
+
+        col1, col2, col3 = st.columns(3)
+
+        with col1:
+
+            st.metric(
+                "Rows",
+                f"{len(df):,}"
+            )
+
+        with col2:
+
+            st.metric(
+                "Columns",
+                f"{len(df.columns):,}"
+            )
+
+        with col3:
+
+            total_nulls = df.isnull().sum().sum()
+
+            total_cells = (
+                df.shape[0] *
+                df.shape[1]
+            )
+
+            if total_cells > 0:
+
+                null_percentage = (
+                    total_nulls /
+                    total_cells
+                ) * 100
+
+            else:
+
+                null_percentage = 0
+
+            st.metric(
+                "Null %",
+                f"{null_percentage:.1f}%"
+            )
+
+        # ==========================================
+        # FIRST 10 ROWS
+        # ==========================================
+
+        st.subheader("First 10 Rows")
+
+        st.dataframe(
+            df.head(10),
+            use_container_width=True,
+            hide_index=True
+        )
+
+        # ==========================================
+        # COLUMN SUMMARY
+        # ==========================================
+
+        st.subheader("Column Summary")
+
+        column_summary = pd.DataFrame({
+
+            "Column":
+                df.columns,
+
+            "Type":
+                df.dtypes.astype(str).values,
+
+            "Non-Null":
+                df.notnull().sum().values,
+
+            "Null Count":
+                df.isnull().sum().values,
+
+            "Null %":
+                (
+                    df.isnull().sum()
+                    / len(df)
+                    * 100
+                ).round(1).values
+        })
+
+        st.dataframe(
+            column_summary,
+            use_container_width=True,
+            hide_index=True
+        )
+
+        # ==========================================
+        # TASK 3: DESCRIPTIVE STATISTICS
+        # ==========================================
+
+        st.divider()
+
+        st.header("Descriptive Statistics")
+
+        numeric_df = df.select_dtypes(
+            include="number"
+        )
+
+        if numeric_df.empty:
+
+            st.info(
+                "No numeric columns are available "
+                "for descriptive statistics."
+            )
+
+        else:
+
+            st.dataframe(
+                numeric_df.describe(),
+                use_container_width=True
+            )
+
+        # ==========================================
+        # TASK 5: QUICK EXPLORATION
+        # ==========================================
+
+        st.divider()
+
+        st.header("Quick Exploration")
+
+        numeric_cols = (
+            df
+            .select_dtypes(
+                include="number"
+            )
+            .columns
+            .tolist()
+        )
+
+        if numeric_cols:
+
+            selected_column = st.selectbox(
+                "Select a numeric column to visualise",
+                numeric_cols
+            )
+
+            st.subheader(
+                f"Distribution of {selected_column}"
+            )
+
+            chart_data = (
+                df[selected_column]
+                .value_counts()
+                .head(20)
+                .sort_index()
+            )
+
+            st.bar_chart(
+                chart_data
+            )
+
+        else:
+
+            st.info(
+                "No numeric columns are available "
+                "for visualization."
+            )
+
+        # ==========================================
+        # OPTIONAL DATASET DETAILS
+        # ==========================================
+
+        with st.expander(
+            "ℹ️ Dataset Details"
+        ):
+
+            st.write(
+                f"**File:** {uploaded_file.name}"
+            )
+
+            st.write(
+                f"**Rows:** {len(df):,}"
+            )
+
+            st.write(
+                f"**Columns:** {len(df.columns):,}"
+            )
+
+            st.write(
+                f"**Total Cells:** "
+                f"{df.shape[0] * df.shape[1]:,}"
+            )
+
+            st.write(
+                f"**Numeric Columns:** "
+                f"{len(numeric_cols)}"
+            )
+
+# ==========================================
+# PAGE: SESSION STATE & WORKFLOW
+# ==========================================
+
+elif selected == "Session State":
+
+    # ------------------------------------------------
+    # SESSION STATE INITIALIZATION
+    # ------------------------------------------------
+
+    # "selected_segment" stores the user's selected
+    # customer segment so it survives Streamlit reruns.
+    if "selected_segment" not in st.session_state:
+        st.session_state["selected_segment"] = "All"
+
+    # "workflow_step" tracks the current workflow step.
+    # Step 1 = segment selection, Step 2 = analysis.
+    if "workflow_step" not in st.session_state:
+        st.session_state["workflow_step"] = 1
+
+    # "analysis_result" stores the calculated result
+    # from Step 2 so it remains available after reruns.
+    if "analysis_result" not in st.session_state:
+        st.session_state["analysis_result"] = None
+
+    # ------------------------------------------------
+    # RESET WORKFLOW
+    # ------------------------------------------------
+
+    with st.sidebar:
+        st.markdown("---")
+
+        if st.button(
+            "🔄 Reset Workflow",
+            key="session_reset_workflow",
+            use_container_width=True
+        ):
+
+            # Remove only the workflow-related session state.
+            # Other application state remains untouched.
+            for key in [
+                "selected_segment",
+                "workflow_step",
+                "analysis_result"
+            ]:
+                if key in st.session_state:
+                    del st.session_state[key]
+
+            st.rerun()
+
+    # ------------------------------------------------
+    # PAGE HEADER
+    # ------------------------------------------------
+
+    st.markdown("""
+        <h1 style="
+            color:#000000;
+            font-size:40px;
+            margin-bottom:0px;
+            font-weight:700;
+        ">
+            Session State Workflow
+        </h1>
+
+        <p style="
+            color:#6B7280;
+            font-size:16px;
+            margin-top:0px;
+        ">
+            Persistent multi-step customer churn analysis
+        </p>
+    """, unsafe_allow_html=True)
+
+    st.divider()
+
+    # ------------------------------------------------
+    # CURRENT WORKFLOW STATUS
+    # ------------------------------------------------
+
+    current_step = st.session_state["workflow_step"]
+
+    st.markdown("### Workflow Status")
+
+    status_col1, status_col2, status_col3 = st.columns(3)
+
+    with status_col1:
+        st.metric(
+            "Current Step",
+            f"Step {current_step}"
+        )
+
+    with status_col2:
+        st.metric(
+            "Selected Segment",
+            st.session_state["selected_segment"]
+        )
+
+    with status_col3:
+        result = st.session_state["analysis_result"]
+
+        if result is None:
+            result_display = "Not calculated"
+        else:
+            result_display = f"{result:,.0f}"
+
+        st.metric(
+            "Analysis Result",
+            result_display
+        )
+
+    st.divider()
+
+    # ==================================================
+    # STEP 1
+    # ==================================================
+
+    st.header("Step 1: Select Customer Segment")
+
+    segments = [
+        "All",
+        "Enterprise",
+        "Mid-Market",
+        "SMB"
+    ]
+
+    # Read the saved value from session state.
+    # This keeps the widget synchronized after reruns.
+    current_segment = st.session_state["selected_segment"]
+
+    if current_segment not in segments:
+        current_segment = "All"
+
+    segment = st.selectbox(
+        "Choose a segment",
+        segments,
+        index=segments.index(current_segment),
+        key="workflow_segment_selector"
+    )
+
+    st.caption(
+        "Your selection will remain available even when "
+        "the application reruns."
+    )
+
+    if st.button(
+        "Confirm Segment →",
+        type="primary",
+        key="confirm_segment_btn"
+    ):
+
+        # Save Step 1 selection into session state.
+        st.session_state["selected_segment"] = segment
+
+        # Move the workflow to Step 2.
+        st.session_state["workflow_step"] = 2
+
+        # Clear any previous result because the segment changed.
+        st.session_state["analysis_result"] = None
+
+        st.rerun()
+
+    # ==================================================
+    # STEP 2
+    # ==================================================
+
+    if st.session_state["workflow_step"] >= 2:
+
+        st.divider()
+
+        st.header("Step 2: Segment Analysis")
+
+        # Retrieve the segment saved in Step 1.
+        chosen_segment = st.session_state["selected_segment"]
+
+        st.success(
+            f"Analyzing customer segment: **{chosen_segment}**"
+        )
+
+        # ------------------------------------------------
+        # FIND SEGMENT COLUMN
+        # ------------------------------------------------
+
+        # Your SupportPulse customer dataset uses plan_type,
+        # so map the workflow segments to the available plans.
+
+        segment_mapping = {
+            "All": None,
+            "Enterprise": "Enterprise",
+            "Mid-Market": "Mid-Market",
+            "SMB": "SMB"
+        }
+
+        target_plan = segment_mapping[chosen_segment]
+
+        analysis_df = customers.copy()
+
+        if target_plan is not None:
+
+            if "plan_type" in analysis_df.columns:
+
+                analysis_df = analysis_df[
+                    analysis_df["plan_type"] == target_plan
+                ]
+
+        # ------------------------------------------------
+        # ANALYSIS
+        # ------------------------------------------------
+
+        total_customers_segment = len(analysis_df)
+
+        if total_customers_segment > 0:
+
+            if "churn_status" in analysis_df.columns:
+
+                churned_customers = int(
+                    analysis_df["churn_status"].sum()
+                )
+
+                churn_rate = (
+                    churned_customers /
+                    total_customers_segment
+                ) * 100
+
+            else:
+
+                churned_customers = 0
+                churn_rate = 0
+
+            if "monthly_spend" in analysis_df.columns:
+
+                total_revenue = float(
+                    analysis_df["monthly_spend"].sum()
+                )
+
+            else:
+
+                total_revenue = 0
+
+            # Store the main analysis result in session state.
+            st.session_state["analysis_result"] = total_revenue
+
+            # ------------------------------------------------
+            # RESULT METRICS
+            # ------------------------------------------------
+
+            st.markdown("### Segment Results")
+
+            r1, r2, r3, r4 = st.columns(4)
+
+            with r1:
+                st.metric(
+                    "Customers",
+                    total_customers_segment
+                )
+
+            with r2:
+                st.metric(
+                    "Churned",
+                    churned_customers
+                )
+
+            with r3:
+                st.metric(
+                    "Churn Rate",
+                    f"{churn_rate:.1f}%"
+                )
+
+            with r4:
+                st.metric(
+                    "Monthly Spend",
+                    f"${total_revenue:,.0f}"
+                )
+
+            # ------------------------------------------------
+            # SEGMENT DATA
+            # ------------------------------------------------
+
+            st.markdown("### Customers in Selected Segment")
+
+            display_columns = [
+                column
+                for column in [
+                    "customer_id",
+                    "name",
+                    "plan_type",
+                    "region",
+                    "monthly_spend",
+                    "churn_status"
+                ]
+                if column in analysis_df.columns
+            ]
+
+            if display_columns:
+
+                display_df = analysis_df[
+                    display_columns
+                ].copy()
+
+                if "churn_status" in display_df.columns:
+
+                    display_df["churn_status"] = (
+                        display_df["churn_status"]
+                        .map({
+                            0: "Active",
+                            1: "Churned"
+                        })
+                    )
+
+                st.dataframe(
+                    display_df,
+                    use_container_width=True,
+                    hide_index=True
+                )
+
+        else:
+
+            st.warning(
+                f"No customers found for the "
+                f"{chosen_segment} segment."
+            )
+
+    # ==================================================
+    # SESSION STATE DEBUG / DEMONSTRATION
+    # ==================================================
+
+    st.divider()
+
+    with st.expander("🔍 View Session State"):
+
+        st.write(
+            "These values persist across Streamlit reruns:"
+        )
+
+        st.json({
+            "selected_segment":
+                st.session_state["selected_segment"],
+
+            "workflow_step":
+                st.session_state["workflow_step"],
+
+            "analysis_result":
+                st.session_state["analysis_result"]
+        })
+# ==========================================
 # OTHER PAGES PLACEHOLDER
 # ==========================================
+
 else:
+
     st.markdown(f"""
-    <h1 style="color:#000000; font-size:40px; margin-bottom:0px; font-weight:700;">{selected}</h1>
-    <p style="color:#6B7280; font-size:16px; margin-top:0px;">Manage module settings and controls for {selected.lower()}</p>
+        <h1 style="color:#000000; font-size:40px; margin-bottom:0px; font-weight:700;">
+            {selected}
+        </h1>
+
+        <p style="color:#6B7280; font-size:16px; margin-top:0px;">
+            Manage module settings and controls for {selected.lower()}
+        </p>
     """, unsafe_allow_html=True)
+
     st.write("")
-    st.info(f"The **{selected}** module view is active. Connect your specific backend data models or filters for this section here.")
- 
+
+    st.info(
+        f"The **{selected}** module view is active. "
+        f"Connect your specific backend data models or filters "
+        f"for this section here."
+    )

@@ -10,10 +10,16 @@ customers = pd.read_csv("data/raw/customers.csv")
 tickets = pd.read_csv("data/raw/tickets.csv")
 transactions = pd.read_csv("data/raw/transactions.csv")
 
+
+
 tickets["csat_score"] = pd.to_numeric(tickets["csat_score"], errors="coerce")
 tickets["resolution_time"] = pd.to_numeric(tickets["resolution_time"], errors="coerce")
 tickets["escalated"] = pd.to_numeric(tickets["escalated"], errors="coerce")
 transactions["amount"] = pd.to_numeric(transactions["amount"], errors="coerce")
+
+
+
+
 
 ticket_summary = tickets.groupby("customer_id").agg(
     total_tickets=("ticket_id", "count"),
