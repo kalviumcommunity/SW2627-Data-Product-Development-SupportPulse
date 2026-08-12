@@ -1992,6 +1992,7 @@ if st.button(
 
     except Exception as error:
 
+
         st.error(
             "Could not generate the report. "
             "Please try again."
