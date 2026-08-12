@@ -1,0 +1,74 @@
+name: SupportPulse Automated Pipeline
+
+on:
+  schedule:
+    # Every Monday at 6:00 AM UTC
+    - cron: "0 6 * * 1"
+
+  # Allows manual execution from GitHub Actions
+  workflow_dispatch:
+
+jobs:
+
+  run-pipeline:
+
+    runs-on: ubuntu-latest
+
+    steps:
+
+      # ==========================================
+      # CHECKOUT REPOSITORY
+      # ==========================================
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # ==========================================
+      # SETUP PYTHON
+      # ==========================================
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+
+        with:
+          python-version: "3.11"
+
+      # ==========================================
+      # INSTALL DEPENDENCIES
+      # ==========================================
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      # ==========================================
+      # RUN PIPELINE
+      # ==========================================
+
+      - name: Run SupportPulse pipeline
+        run: |
+          python pipeline.py \
+            --input data/raw/customers.csv \
+            --output output/pipeline
+
+      # ==========================================
+      # VERIFY OUTPUT
+      # ==========================================
+
+      - name: Verify pipeline output
+        run: |
+          test -f output/pipeline/cleaned_data.csv
+          test -f output/pipeline/aggregated_metrics.csv
+          echo "Pipeline output files verified successfully."
+
+      # ==========================================
+      # UPLOAD OUTPUT AS ARTIFACT
+      # ==========================================
+
+      - name: Upload pipeline output
+        uses: actions/upload-artifact@v4
+
+        with:
+          name: supportpulse-pipeline-output
+          path: output/pipeline/

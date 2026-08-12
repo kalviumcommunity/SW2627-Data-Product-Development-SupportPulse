@@ -9,7 +9,8 @@ from utils.kpi_utils import (
     calculate_kpis,
     get_trend_indicator
 )
-
+from report_generator import generate_report
+from email_sender import send_report_email
 metrics = pd.read_csv("output/dashboard_metrics.csv")
 
 customers = pd.read_csv(
@@ -1949,6 +1950,140 @@ elif selected == "Dataset Upload":
             f"**Numeric Columns:** "
             f"{len(df.select_dtypes(include='number').columns)}"
         )
+
+# ==========================================
+# INSIGHT REPORT & EMAIL
+# ==========================================
+
+st.divider()
+
+st.header("📧 Insight Report")
+
+st.caption(
+    "Generate a report from the currently filtered dataset "
+    "and send it by email."
+)
+
+# ==========================================
+# GENERATE REPORT
+# ==========================================
+
+if st.button(
+    "📄 Generate Report",
+    key="generate_insight_report",
+    use_container_width=True
+):
+
+    try:
+
+        report_content = generate_report(
+            filtered_df
+        )
+
+        st.session_state[
+            "generated_report"
+        ] = report_content
+
+        st.success(
+            "Report generated successfully."
+        )
+        if "generated_report" not in st.session_state:
+            st.session_state["generated_report"] = None
+
+    except Exception as error:
+
+
+        st.error(
+            "Could not generate the report. "
+            "Please try again."
+        )
+
+        st.session_state[
+            "generated_report"
+        ] = None
+
+
+# ==========================================
+# REPORT PREVIEW
+# ==========================================
+
+if (
+    "generated_report"
+    in st.session_state
+    and
+    st.session_state["generated_report"]
+):
+
+    st.subheader("Report Preview")
+
+    st.text_area(
+        "Generated Report",
+        value=st.session_state[
+            "generated_report"
+        ],
+        height=350,
+        disabled=True
+    )
+
+    # ==========================================
+    # EMAIL DETAILS
+    # ==========================================
+
+    st.subheader("Send Report")
+
+    recipient = st.text_input(
+        "Recipient Email",
+        placeholder="manager@example.com",
+        key="report_recipient"
+    )
+
+    subject = st.text_input(
+        "Email Subject",
+        value="SupportPulse Insight Report",
+        key="report_subject"
+    )
+
+    if st.button(
+        "📨 Send Report",
+        type="primary",
+        key="send_insight_report",
+        use_container_width=True
+    ):
+
+        if not recipient.strip():
+
+            st.warning(
+                "Please enter a recipient email address."
+            )
+
+        else:
+
+            with st.spinner(
+                "Sending report..."
+            ):
+
+                email_sent = send_report_email(
+                    recipient=recipient.strip(),
+                    subject=subject.strip(),
+                    report_content=st.session_state[
+                        "generated_report"
+                    ]
+                )
+
+            if email_sent:
+
+                st.success(
+                    f"Report sent successfully to "
+                    f"{recipient.strip()}."
+                )
+
+            else:
+
+                st.error(
+                    "The report could not be sent. "
+                    "Please check the SMTP configuration "
+                    "and try again."
+                )
 # ==========================================
 # PAGE: SESSION STATE & WORKFLOW
 # ==========================================
