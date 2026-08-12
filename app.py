@@ -4,7 +4,7 @@ import plotly.express as px
 from streamlit_option_menu import option_menu
 from streamlit_export_integration import render_export_section
 import os
-
+from alert_config import ALERT_THRESHOLDS
 from utils.kpi_utils import (
     calculate_kpis,
     get_trend_indicator
@@ -56,6 +56,52 @@ def load_uploaded_data(file_bytes, file_name):
     raise ValueError(
         "Unsupported file type. Please upload CSV or JSON."
     )
+
+# ==========================================
+# ALERT CHECKING
+# ==========================================
+
+def check_alerts(metrics_dict, thresholds):
+    """
+    Compare current KPI values against configured
+    thresholds and return triggered alerts.
+    """
+
+    triggered = []
+
+    for key, config in thresholds.items():
+
+        if key not in metrics_dict:
+            continue
+
+        value = metrics_dict[key]
+        threshold = config["threshold"]
+
+        breached = False
+
+        if (
+            config["direction"] == "above"
+            and value > threshold
+        ):
+            breached = True
+
+        elif (
+            config["direction"] == "below"
+            and value < threshold
+        ):
+            breached = True
+
+        if breached:
+
+            triggered.append({
+                "metric": config["metric"],
+                "value": value,
+                "threshold": threshold,
+                "severity": config["severity"],
+                "message": config["message"]
+            })
+
+    return triggered
 st.markdown("""
 <style>
 [data-testid="stSidebarNav"] {
@@ -1526,6 +1572,93 @@ elif selected == "Dataset Upload":
 
         data_quality = 100
 
+        # ==========================================
+    # ALERT MONITORING
+    # ==========================================
+
+    current_metrics = {
+        "churn_rate": churn_rate,
+        "average_spend": average_spend,
+        "null_percentage": 100 - data_quality
+    }
+
+    alerts = check_alerts(
+        current_metrics,
+        ALERT_THRESHOLDS
+    )
+
+    # ==========================================
+    # DISPLAY ALERTS
+    # ==========================================
+
+    if alerts:
+
+        st.divider()
+
+        st.header("🚨 Active Alerts")
+
+        for alert in alerts:
+
+            alert_text = (
+                f"{alert['metric']} is "
+                f"{alert['value']:.1f} "
+                f"(threshold: {alert['threshold']}). "
+                f"{alert['message']}"
+            )
+
+            if alert["severity"] == "critical":
+
+                st.error(
+                    "ALERT: " + alert_text
+                )
+
+            else:
+
+                st.warning(
+                    "WARNING: " + alert_text
+                )
+
+    else:
+
+        st.success(
+            "✅ All monitored metrics are within safe thresholds."
+        )
+
+    # ==========================================
+    # DISPLAY 5 KPIs
+    # ==========================================
+
+    k1, k2, k3, k4, k5 = st.columns(5)
+
+    with k1:
+        st.metric(
+            "Total Records",
+            f"{total_records:,}"
+        )
+
+    with k2:
+        st.metric(
+            "Total Spend",
+            f"${total_revenue:,.0f}"
+        )
+
+    with k3:
+        st.metric(
+            "Average Spend",
+            f"${average_spend:,.2f}"
+        )
+
+    with k4:
+        st.metric(
+            "Churn Rate",
+            f"{churn_rate:.1f}%"
+        )
+
+    with k5:
+        st.metric(
+            "Data Quality",
+            f"{data_quality:.1f}%"
+        )
     # ==========================================
     # DISPLAY 5 KPIs
     # ==========================================
