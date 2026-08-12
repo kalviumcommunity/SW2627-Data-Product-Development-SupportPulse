@@ -36,7 +36,26 @@ st.set_page_config(
     layout="wide",
     initial_sidebar_state="expanded",
 )
+@st.cache_data
+def load_uploaded_data(file_bytes, file_name):
+    """
+    Load an uploaded CSV or JSON file.
 
+    Streamlit caches the DataFrame using the file content
+    and file name, so filter changes do not reload the file.
+    """
+
+    if file_name.lower().endswith(".csv"):
+        from io import BytesIO
+        return pd.read_csv(BytesIO(file_bytes))
+
+    elif file_name.lower().endswith(".json"):
+        from io import BytesIO
+        return pd.read_json(BytesIO(file_bytes))
+
+    raise ValueError(
+        "Unsupported file type. Please upload CSV or JSON."
+    )
 st.markdown("""
 <style>
 [data-testid="stSidebarNav"] {
@@ -1080,21 +1099,36 @@ elif selected == "Settings":
 # PAGE: DATASET UPLOAD
 # ==========================================
 
+# ==========================================
+# PAGE: DATASET UPLOAD
+# REAL-TIME KPI DASHBOARD
+# ==========================================
+
 elif selected == "Dataset Upload":
 
     st.markdown("""
-        <h1 style="color:#000000; font-size:40px; margin-bottom:0px; font-weight:700;">
+        <h1 style="
+            color:#000000;
+            font-size:40px;
+            margin-bottom:0px;
+            font-weight:700;
+        ">
             Dataset Upload
         </h1>
-        <p style="color:#6B7280; font-size:16px; margin-top:0px;">
-            Upload and explore CSV or JSON datasets
+
+        <p style="
+            color:#6B7280;
+            font-size:16px;
+            margin-top:0px;
+        ">
+            Upload, filter and analyse your dataset in real time
         </p>
     """, unsafe_allow_html=True)
 
     st.divider()
 
     # ==========================================
-    # TASK 1: FILE UPLOAD
+    # FILE UPLOAD
     # ==========================================
 
     st.header("Upload Dataset")
@@ -1106,7 +1140,7 @@ elif selected == "Dataset Upload":
     )
 
     # ==========================================
-    # NO FILE UPLOADED
+    # NO FILE
     # ==========================================
 
     if uploaded_file is None:
@@ -1115,291 +1149,673 @@ elif selected == "Dataset Upload":
             "Upload a CSV or JSON file to begin."
         )
 
-    else:
+        st.stop()
 
-        # ==========================================
-        # READ UPLOADED FILE
-        # ==========================================
+    # ==========================================
+    # LOAD DATA USING CACHE
+    # ==========================================
 
-        try:
+    try:
 
-            uploaded_file.seek(0)
+        file_bytes = uploaded_file.getvalue()
 
-            if uploaded_file.name.lower().endswith(".csv"):
+        df = load_uploaded_data(
+            file_bytes,
+            uploaded_file.name
+        )
 
-                df = pd.read_csv(
-                    uploaded_file
-                )
+    except ValueError as e:
 
-            elif uploaded_file.name.lower().endswith(".json"):
+        st.error(str(e))
+        st.stop()
 
-                df = pd.read_json(
-                    uploaded_file
-                )
+    except pd.errors.EmptyDataError:
 
-            else:
+        st.warning(
+            "Uploaded file is empty. "
+            "Please upload a file containing data."
+        )
 
-                st.error(
-                    "Unsupported file type. "
-                    "Please upload a CSV or JSON file."
-                )
+        st.stop()
 
-                st.stop()
+    except Exception as e:
 
-        # ==========================================
-        # ERROR HANDLING
-        # ==========================================
+        st.error(
+            "Could not read this file. "
+            "Please check that it is a valid CSV or JSON dataset."
+        )
 
-        except pd.errors.EmptyDataError:
+        st.stop()
 
-            st.warning(
-                "Uploaded file is empty. "
-                "Please upload a file containing data."
-            )
+    # ==========================================
+    # EMPTY DATASET
+    # ==========================================
 
-            st.stop()
+    if df.empty:
 
-        except (
-            ValueError,
-            TypeError
-        ):
+        st.warning(
+            "Uploaded file contains no records."
+        )
 
-            st.error(
-                "Could not read this file. "
-                "Please check that the file is a valid "
-                "CSV or JSON dataset."
-            )
+        st.stop()
 
-            st.stop()
+    # ==========================================
+    # SUCCESS
+    # ==========================================
 
-        except Exception:
+    st.success(
+        f"Loaded: {uploaded_file.name} "
+        f"({len(df):,} rows, {len(df.columns):,} columns)"
+    )
 
-            st.error(
-                "Could not read this file. "
-                "Check the format and try again."
-            )
+    # ==========================================
+    # DATASET OVERVIEW
+    # ==========================================
 
-            st.stop()
+    st.divider()
 
-        # ==========================================
-        # EMPTY DATAFRAME
-        # ==========================================
+    st.header("Dataset Overview")
 
-        if df.empty:
+    overview_1, overview_2, overview_3 = st.columns(3)
 
-            st.warning(
-                "Uploaded file is empty."
-            )
+    with overview_1:
 
-            st.stop()
+        st.metric(
+            "Rows",
+            f"{len(df):,}"
+        )
 
-        # ==========================================
-        # SUCCESS MESSAGE
-        # ==========================================
+    with overview_2:
+
+        st.metric(
+            "Columns",
+            f"{len(df.columns):,}"
+        )
+
+    with overview_3:
+
+        total_nulls = df.isnull().sum().sum()
+
+        total_cells = (
+            df.shape[0] *
+            df.shape[1]
+        )
+
+        null_percentage = (
+            (total_nulls / total_cells) * 100
+            if total_cells > 0
+            else 0
+        )
+
+        st.metric(
+            "Null %",
+            f"{null_percentage:.1f}%"
+        )
+
+    # ==========================================
+    # COLUMN VALIDATION
+    # ==========================================
+
+    st.divider()
+
+    st.header("Column Validation")
+
+    available_columns = set(df.columns)
+
+    # SupportPulse dataset columns that we can use
+    # for the reactive KPI dashboard.
+    preferred_columns = [
+        "customer_id",
+        "monthly_spend",
+        "churn_status",
+        "plan_type",
+        "region",
+        "signup_date"
+    ]
+
+    available_preferred = [
+        column
+        for column in preferred_columns
+        if column in available_columns
+    ]
+
+    missing_preferred = [
+        column
+        for column in preferred_columns
+        if column not in available_columns
+    ]
+
+    if available_preferred:
 
         st.success(
-            f"Loaded: {uploaded_file.name} "
-            f"({len(df):,} rows, "
-            f"{len(df.columns):,} columns)"
+            "Available dashboard columns: "
+            + ", ".join(available_preferred)
         )
 
-        # ==========================================
-        # TASK 2: DATASET OVERVIEW
-        # ==========================================
+    if missing_preferred:
 
-        st.divider()
-
-        st.header("Dataset Overview")
-
-        col1, col2, col3 = st.columns(3)
-
-        with col1:
-
-            st.metric(
-                "Rows",
-                f"{len(df):,}"
-            )
-
-        with col2:
-
-            st.metric(
-                "Columns",
-                f"{len(df.columns):,}"
-            )
-
-        with col3:
-
-            total_nulls = df.isnull().sum().sum()
-
-            total_cells = (
-                df.shape[0] *
-                df.shape[1]
-            )
-
-            if total_cells > 0:
-
-                null_percentage = (
-                    total_nulls /
-                    total_cells
-                ) * 100
-
-            else:
-
-                null_percentage = 0
-
-            st.metric(
-                "Null %",
-                f"{null_percentage:.1f}%"
-            )
-
-        # ==========================================
-        # FIRST 10 ROWS
-        # ==========================================
-
-        st.subheader("First 10 Rows")
-
-        st.dataframe(
-            df.head(10),
-            use_container_width=True,
-            hide_index=True
+        st.caption(
+            "Optional columns not found: "
+            + ", ".join(missing_preferred)
         )
 
-        # ==========================================
-        # COLUMN SUMMARY
-        # ==========================================
+    # ==========================================
+    # FILTER SECTION
+    # ==========================================
 
-        st.subheader("Column Summary")
+    st.divider()
 
-        column_summary = pd.DataFrame({
+    st.header("Filters")
 
-            "Column":
-                df.columns,
+    filtered_df = df.copy()
 
-            "Type":
-                df.dtypes.astype(str).values,
+    filter_col1, filter_col2, filter_col3 = st.columns(3)
 
-            "Non-Null":
-                df.notnull().sum().values,
+    # ------------------------------------------
+    # PLAN FILTER
+    # ------------------------------------------
 
-            "Null Count":
-                df.isnull().sum().values,
+    with filter_col1:
 
-            "Null %":
-                (
-                    df.isnull().sum()
-                    / len(df)
-                    * 100
-                ).round(1).values
-        })
+        if "plan_type" in filtered_df.columns:
 
-        st.dataframe(
-            column_summary,
-            use_container_width=True,
-            hide_index=True
-        )
-
-        # ==========================================
-        # TASK 3: DESCRIPTIVE STATISTICS
-        # ==========================================
-
-        st.divider()
-
-        st.header("Descriptive Statistics")
-
-        numeric_df = df.select_dtypes(
-            include="number"
-        )
-
-        if numeric_df.empty:
-
-            st.info(
-                "No numeric columns are available "
-                "for descriptive statistics."
+            plan_options = sorted(
+                filtered_df["plan_type"]
+                .dropna()
+                .astype(str)
+                .unique()
+                .tolist()
             )
+
+            selected_plan = st.selectbox(
+                "Plan Type",
+                ["All"] + plan_options,
+                key="kpi_plan_filter"
+            )
+
+            if selected_plan != "All":
+
+                filtered_df = filtered_df[
+                    filtered_df["plan_type"].astype(str)
+                    == selected_plan
+                ]
 
         else:
 
-            st.dataframe(
-                numeric_df.describe(),
+            st.info(
+                "Plan Type filter unavailable."
+            )
+
+    # ------------------------------------------
+    # REGION FILTER
+    # ------------------------------------------
+
+    with filter_col2:
+
+        if "region" in filtered_df.columns:
+
+            region_options = sorted(
+                filtered_df["region"]
+                .dropna()
+                .astype(str)
+                .unique()
+                .tolist()
+            )
+
+            selected_region = st.selectbox(
+                "Region",
+                ["All"] + region_options,
+                key="kpi_region_filter"
+            )
+
+            if selected_region != "All":
+
+                filtered_df = filtered_df[
+                    filtered_df["region"].astype(str)
+                    == selected_region
+                ]
+
+        else:
+
+            st.info(
+                "Region filter unavailable."
+            )
+
+    # ------------------------------------------
+    # CHURN FILTER
+    # ------------------------------------------
+
+    with filter_col3:
+
+        if "churn_status" in filtered_df.columns:
+
+            churn_options = {
+                "All": None,
+                "Active": 0,
+                "Churned": 1
+            }
+
+            selected_churn = st.selectbox(
+                "Customer Status",
+                list(churn_options.keys()),
+                key="kpi_churn_filter"
+            )
+
+            churn_value = churn_options[selected_churn]
+
+            if churn_value is not None:
+
+                filtered_df = filtered_df[
+                    filtered_df["churn_status"]
+                    == churn_value
+                ]
+
+        else:
+
+            st.info(
+                "Churn filter unavailable."
+            )
+
+    # ==========================================
+    # EMPTY FILTER RESULT
+    # ==========================================
+
+    if filtered_df.empty:
+
+        st.warning(
+            "No records match the selected filters."
+        )
+
+        st.info(
+            "Try changing the Plan Type, Region, "
+            "or Customer Status filters."
+        )
+
+        st.stop()
+
+    # ==========================================
+    # REACTIVE KPI DASHBOARD
+    # ==========================================
+
+    st.divider()
+
+    st.header("Real-Time KPI Dashboard")
+
+    # ------------------------------------------
+    # KPI 1 — TOTAL RECORDS
+    # ------------------------------------------
+
+    total_records = len(filtered_df)
+
+    # ------------------------------------------
+    # KPI 2 — TOTAL REVENUE / SPEND
+    # ------------------------------------------
+
+    if "monthly_spend" in filtered_df.columns:
+
+        total_revenue = pd.to_numeric(
+            filtered_df["monthly_spend"],
+            errors="coerce"
+        ).fillna(0).sum()
+
+    else:
+
+        total_revenue = 0
+
+    # ------------------------------------------
+    # KPI 3 — AVERAGE SPEND
+    # ------------------------------------------
+
+    if "monthly_spend" in filtered_df.columns:
+
+        average_spend = pd.to_numeric(
+            filtered_df["monthly_spend"],
+            errors="coerce"
+        ).fillna(0).mean()
+
+    else:
+
+        average_spend = 0
+
+    # ------------------------------------------
+    # KPI 4 — CHURN RATE
+    # ------------------------------------------
+
+    if "churn_status" in filtered_df.columns:
+
+        churn_rate = (
+            pd.to_numeric(
+                filtered_df["churn_status"],
+                errors="coerce"
+            )
+            .fillna(0)
+            .mean()
+            * 100
+        )
+
+    else:
+
+        churn_rate = 0
+
+    # ------------------------------------------
+    # KPI 5 — DATA QUALITY
+    # ------------------------------------------
+
+    total_missing = (
+        filtered_df.isnull()
+        .sum()
+        .sum()
+    )
+
+    total_cells_filtered = (
+        filtered_df.shape[0] *
+        filtered_df.shape[1]
+    )
+
+    if total_cells_filtered > 0:
+
+        data_quality = (
+            1 -
+            (
+                total_missing /
+                total_cells_filtered
+            )
+        ) * 100
+
+    else:
+
+        data_quality = 100
+
+    # ==========================================
+    # DISPLAY 5 KPIs
+    # ==========================================
+
+    k1, k2, k3, k4, k5 = st.columns(5)
+
+    with k1:
+
+        st.metric(
+            "Total Records",
+            f"{total_records:,}"
+        )
+
+    with k2:
+
+        st.metric(
+            "Total Spend",
+            f"${total_revenue:,.0f}"
+        )
+
+    with k3:
+
+        st.metric(
+            "Average Spend",
+            f"${average_spend:,.2f}"
+        )
+
+    with k4:
+
+        st.metric(
+            "Churn Rate",
+            f"{churn_rate:.1f}%"
+        )
+
+    with k5:
+
+        st.metric(
+            "Data Quality",
+            f"{data_quality:.1f}%"
+        )
+
+    # ==========================================
+    # CHART SECTION
+    # ==========================================
+
+    st.divider()
+
+    st.header("Interactive Charts")
+
+    chart_left, chart_right = st.columns(2)
+
+    # ==========================================
+    # CHART 1 — LINE CHART
+    # ==========================================
+
+    with chart_left:
+
+        st.subheader("Customer Trend")
+
+        if "signup_date" in filtered_df.columns:
+
+            trend_df = filtered_df.copy()
+
+            trend_df["signup_date"] = pd.to_datetime(
+                trend_df["signup_date"],
+                errors="coerce"
+            )
+
+            trend_df = trend_df.dropna(
+                subset=["signup_date"]
+            )
+
+            if not trend_df.empty:
+
+                trend_df["Month"] = (
+                    trend_df["signup_date"]
+                    .dt.to_period("M")
+                    .astype(str)
+                )
+
+                monthly_trend = (
+                    trend_df
+                    .groupby("Month")
+                    .size()
+                    .reset_index(
+                        name="Customers"
+                    )
+                )
+
+                fig_line = px.line(
+                    monthly_trend,
+                    x="Month",
+                    y="Customers",
+                    markers=True,
+                    title="Customers Over Time"
+                )
+
+                fig_line.update_layout(
+                    plot_bgcolor="white",
+                    paper_bgcolor="white",
+                    height=400
+                )
+
+                st.plotly_chart(
+                    fig_line,
+                    use_container_width=True
+                )
+
+            else:
+
+                st.info(
+                    "No valid date values available."
+                )
+
+        else:
+
+            st.info(
+                "Signup date column is unavailable."
+            )
+
+    # ==========================================
+    # CHART 2 — BAR CHART
+    # ==========================================
+
+    with chart_right:
+
+        st.subheader("Spend by Plan")
+
+        if (
+            "plan_type" in filtered_df.columns
+            and "monthly_spend" in filtered_df.columns
+        ):
+
+            plan_chart_df = filtered_df.copy()
+
+            plan_chart_df["monthly_spend"] = (
+                pd.to_numeric(
+                    plan_chart_df["monthly_spend"],
+                    errors="coerce"
+                )
+                .fillna(0)
+            )
+
+            plan_summary = (
+                plan_chart_df
+                .groupby("plan_type")[
+                    "monthly_spend"
+                ]
+                .sum()
+                .reset_index()
+            )
+
+            if not plan_summary.empty:
+
+                fig_bar = px.bar(
+                    plan_summary,
+                    x="plan_type",
+                    y="monthly_spend",
+                    title="Monthly Spend by Plan",
+                    labels={
+                        "plan_type": "Plan",
+                        "monthly_spend": "Spend"
+                    }
+                )
+
+                fig_bar.update_layout(
+                    plot_bgcolor="white",
+                    paper_bgcolor="white",
+                    height=400
+                )
+
+                st.plotly_chart(
+                    fig_bar,
+                    use_container_width=True
+                )
+
+            else:
+
+                st.info(
+                    "No plan data available."
+                )
+
+        else:
+
+            st.info(
+                "Plan Type or Monthly Spend column "
+                "is unavailable."
+            )
+
+    # ==========================================
+    # CHART 3 — HISTOGRAM
+    # ==========================================
+
+    st.subheader("Spend Distribution")
+
+    if "monthly_spend" in filtered_df.columns:
+
+        histogram_df = filtered_df.copy()
+
+        histogram_df["monthly_spend"] = (
+            pd.to_numeric(
+                histogram_df["monthly_spend"],
+                errors="coerce"
+            )
+        )
+
+        histogram_df = histogram_df.dropna(
+            subset=["monthly_spend"]
+        )
+
+        if not histogram_df.empty:
+
+            fig_hist = px.histogram(
+                histogram_df,
+                x="monthly_spend",
+                nbins=20,
+                title="Monthly Spend Distribution",
+                labels={
+                    "monthly_spend": "Monthly Spend"
+                }
+            )
+
+            fig_hist.update_layout(
+                plot_bgcolor="white",
+                paper_bgcolor="white",
+                height=400
+            )
+
+            st.plotly_chart(
+                fig_hist,
                 use_container_width=True
             )
 
-        # ==========================================
-        # TASK 5: QUICK EXPLORATION
-        # ==========================================
-
-        st.divider()
-
-        st.header("Quick Exploration")
-
-        numeric_cols = (
-            df
-            .select_dtypes(
-                include="number"
-            )
-            .columns
-            .tolist()
-        )
-
-        if numeric_cols:
-
-            selected_column = st.selectbox(
-                "Select a numeric column to visualise",
-                numeric_cols
-            )
-
-            st.subheader(
-                f"Distribution of {selected_column}"
-            )
-
-            chart_data = (
-                df[selected_column]
-                .value_counts()
-                .head(20)
-                .sort_index()
-            )
-
-            st.bar_chart(
-                chart_data
-            )
-
         else:
 
             st.info(
-                "No numeric columns are available "
-                "for visualization."
+                "No numeric spend values available."
             )
 
-        # ==========================================
-        # OPTIONAL DATASET DETAILS
-        # ==========================================
+    else:
 
-        with st.expander(
-            "ℹ️ Dataset Details"
-        ):
+        st.info(
+            "Monthly Spend column is unavailable."
+        )
 
-            st.write(
-                f"**File:** {uploaded_file.name}"
-            )
+    # ==========================================
+    # FILTERED DATA PREVIEW
+    # ==========================================
 
-            st.write(
-                f"**Rows:** {len(df):,}"
-            )
+    st.divider()
 
-            st.write(
-                f"**Columns:** {len(df.columns):,}"
-            )
+    st.header("Filtered Dataset")
 
-            st.write(
-                f"**Total Cells:** "
-                f"{df.shape[0] * df.shape[1]:,}"
-            )
+    st.caption(
+        f"Showing {len(filtered_df):,} records "
+        f"after applying the selected filters."
+    )
 
-            st.write(
-                f"**Numeric Columns:** "
-                f"{len(numeric_cols)}"
-            )
+    st.dataframe(
+        filtered_df,
+        use_container_width=True,
+        hide_index=True
+    )
 
+    # ==========================================
+    # DATASET DETAILS
+    # ==========================================
+
+    with st.expander("ℹ️ Dataset Details"):
+
+        st.write(
+            f"**File:** {uploaded_file.name}"
+        )
+
+        st.write(
+            f"**Original Rows:** {len(df):,}"
+        )
+
+        st.write(
+            f"**Filtered Rows:** {len(filtered_df):,}"
+        )
+
+        st.write(
+            f"**Columns:** {len(df.columns):,}"
+        )
+
+        st.write(
+            f"**Numeric Columns:** "
+            f"{len(df.select_dtypes(include='number').columns)}"
+        )
 # ==========================================
 # PAGE: SESSION STATE & WORKFLOW
 # ==========================================
