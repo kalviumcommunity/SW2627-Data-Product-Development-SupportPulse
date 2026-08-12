@@ -232,7 +232,7 @@ The data product follows this general flow:
                 | Insight Reports  |
                 | Email Delivery   |
                 +------------------+
-
+```
 ### Pipeline Stages
 **1. Ingestion**
 
@@ -341,7 +341,7 @@ Use the available filters to narrow the customer dataset.
 The dashboard recalculates the displayed metrics based on the selected
 filters.
 
-KPI Monitoring
+**KPI Monitoring**
 
 Review:
 
@@ -354,12 +354,12 @@ Alerts
 
 Review active alerts when metrics exceed configured thresholds.
 
-Customer Risk
+**Customer Risk**
 
 Use the churn-risk analysis to identify customers requiring retention
 attention.
 
-Reports
+**Reports**
 
 Generate a report from the filtered dataset and use the configured email
 settings when email delivery is required.
@@ -372,17 +372,17 @@ validate_data.py
 
 The validation process checks:
 
-Required columns
-Numeric data types
-Minimum row count
-Fully-null columns
-Customer ID validity
-Churn status values
+- Required columns
+- Numeric data types
+- Minimum row count
+- Fully-null columns
+- Customer ID validity
+- Churn status values
 
 Run validation manually:
-
+```
 python validate_data.py data/raw/customers.csv
-
+```
 A successful validation returns exit code 0.
 
 A failed validation returns exit code 1.
@@ -413,7 +413,8 @@ Output
 
 The pipeline logs each stage with timestamps and status messages.
 
-📁 Project Structure
+#### 📁 Project Structure
+```
 SupportPulse/
 │
 ├── app.py
@@ -445,7 +446,9 @@ SupportPulse/
 │
 └── .github/
     └── workflows/
-⚠️ Known Limitations
+```
+**⚠️ Known Limitations**
+
 The current customer risk score is rule-based rather than a trained
 machine-learning model.
 Risk scoring depends on the availability and quality of support and
