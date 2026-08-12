@@ -1,0 +1,4 @@
+plan_type,customer_count,total_monthly_spend,churn_rate
+Basic,34,1846.34,26.47058823529412
+Premium,23,5353.21,17.391304347826086
+Pro,63,7507.73,22.22222222222222
